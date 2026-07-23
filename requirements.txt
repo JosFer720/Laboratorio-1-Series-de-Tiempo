@@ -1,0 +1,12 @@
+pandas>=2.2,<3
+numpy
+openpyxl
+matplotlib
+seaborn
+
+statsmodels             
+scikit-learn            
+pmdarima                
+prophet                
+
+jupyter

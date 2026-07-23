@@ -1,0 +1,56 @@
+# ------------------------------------------------------------
+# Entornos virtuales (no se commitean: cada quien los regenera
+# con `python src/00_init.py` o `pip install -r requirements.txt`)
+# ------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# ------------------------------------------------------------
+# Python
+# ------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+.Python
+
+# ------------------------------------------------------------
+# Datos generados. Son reproducibles corriendo el pipeline, asi
+# que no se versionan... con UNA excepcion: las series finales.
+#
+# Se excluye el CONTENIDO de processed/ y no la carpeta, porque
+# git no vuelve a incluir archivos que esten dentro de un
+# directorio ya excluido.
+#
+# data/processed/series/ SI se versiona: son 8 CSV de ~210 filas
+# que constituyen el insumo del analisis. Versionarlos permite
+# trabajar los cuadernos sin tener que releer el .xlsx crudo
+# (que tarda 1-2 min) y garantiza que todo el equipo analice
+# exactamente las mismas series.
+# ------------------------------------------------------------
+data/processed/*
+!data/processed/series/
+
+# Los datos crudos (data/raw/) SI se versionan: son la fuente de
+# verdad del proyecto y nunca se modifican.
+
+# ------------------------------------------------------------
+# Salidas de LaTeX / PDF intermedias del informe
+# ------------------------------------------------------------
+*.aux
+*.log
+*.out
+*.toc
+
+# ------------------------------------------------------------
+# Sistema operativo / editores
+# ------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
