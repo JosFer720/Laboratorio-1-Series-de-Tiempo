@@ -51,7 +51,7 @@ O una etapa a la vez (cada script es independiente):
 
 ```
 python src/01_ingesta.py     # .xlsx -> CSV con columna de fecha
-python src/02_limpieza.py    # tipado, nulos, duplicados, filtro de visitantes
+python src/02_limpieza.py    # tipado, normalización, reporte de nulos y duplicados
 python src/03_series.py      # construye y exporta las series mensuales
 ```
 
@@ -104,13 +104,31 @@ Las tres decisiones que condicionan cómo se construyen las series. Viven en
 ### Categorías analizadas
 
 Además de la serie obligatoria (total mensual), el enunciado pide elegir dos
-categorías. Se eligieron **Vías de ingreso** y **Países de residencia (Top 3)**:
+categorías. Se eligieron **Fronteras (Top 3)** y **Países de residencia (Top 3)**:
 
-- **Vías** da tres series sin ambigüedad de selección y con contrastes fuertes:
-  Terrestre domina en volumen, Aérea es la más estacional, y Marítima es
-  pequeña, volátil y con un quiebre propio en 2017.
-- **Países** es lo más accionable para INGUAT, y los mercados principales se
-  mantienen comparables pese al cambio de granularidad de 2023.
+- **Fronteras** conserva el contraste entre vía aérea y vía terrestre —La Aurora
+  es el aeropuerto internacional, Valle Nuevo y San Cristóbal son puestos
+  terrestres— y las tres series están completas: **ningún mes vacío en los 210**.
+  Es además directamente accionable: indica dónde invertir en capacidad e
+  infraestructura de atención.
+- **Países** es el mercado emisor, y los principales se mantienen comparables
+  pese al cambio de granularidad de 2023.
+
+Las dos categorías son **ortogonales**: una mide *de dónde vienen* los viajeros
+y la otra *por dónde entran*. Eso evita que ambas respondan la misma pregunta y
+enriquece el análisis comparativo.
+
+#### Por qué no se usó "Vías de ingreso"
+
+Fue la primera opción, pero **no es viable junto con el filtro de visitantes**.
+Al quedarse solo con Turista + Excursionista, la serie **Marítima vale cero
+exacto desde 2017**: 114 de los 210 meses en cero.
+
+La causa está en la fuente: desde 2017 los arribos marítimos se registran casi
+exclusivamente como *Cruceristas*, que no son visitantes bajo el criterio de D3
+y que además desaparecen del dataset a partir de 2023. Una serie con diez años
+consecutivos de ceros no admite descomposición, prueba de Dickey-Fuller ni
+modelado ARIMA, así que la categoría se descartó y se documentó el hallazgo.
 
 ### Se excluye `Guatemala` del Top 3 de países
 
@@ -141,7 +159,7 @@ Siete series mensuales (`MS`, período estacional 12), de enero 2009 a junio 202
 | Archivo | Serie |
 |---|---|
 | `S0_total` | Total mensual de viajeros internacionales *(obligatoria)* |
-| `S1_aerea`, `S2_terrestre`, `S3_maritima` | Por vía de ingreso |
+| `S1_la_aurora`, `S2_valle_nuevo`, `S3_san_cristobal` | Top 3 fronteras de ingreso |
 | `S4_el_salvador`, `S5_estados_unidos`, `S6_honduras` | Top 3 países de residencia |
 
 ### Partición entrenamiento / prueba
@@ -158,11 +176,3 @@ TEST : abr 2021 – jun 2026   ( 63 meses, 30%)
 > conjunto de prueba cubriendo íntegramente la recuperación. Es consecuencia
 > directa de aplicar la proporción pedida sobre este período, y se analiza
 > explícitamente en el informe.
-
-## Equipo
-
-| | Responsabilidad |
-|---|---|
-| Persona A | Pipeline de datos, serie total, integración del informe |
-| Persona B | Análisis exploratorio, series de vías de ingreso |
-| Persona C | Series de países de residencia, modelos alternativos |

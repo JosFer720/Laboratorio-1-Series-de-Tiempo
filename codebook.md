@@ -76,17 +76,76 @@ variables del crudo y agrega la columna de fecha.
 
 - Se construyó `fecha` como inicio de mes (`MS`) a partir de `Año` y `Mes cod`.
 - `Viajero` se tipó a `float` **conservando los decimales** (§1.2).
-- Se normalizó el texto de las columnas categóricas (espacios sobrantes y
-  capitalización inconsistente).
 - Se validó que existan **210 meses consecutivos sin huecos**: un mes faltante
   rompería la descomposición estacional y las pruebas de estacionariedad más
   adelante, y el error aparecería tarde y sin un mensaje claro.
-- Los nulos y duplicados se **cuentan y reportan**, no se eliminan a ciegas. El
-  tratamiento de cada caso es una decisión de análisis que se documenta en el
-  análisis exploratorio, no un supuesto oculto del pipeline.
-- `Cruceristas` se **etiqueta** como valor contaminante en `País` y `Región dos`,
-  pero no se borra del dataset: se excluye al construir las series de país, y se
-  conserva para poder estudiarlo como tipo de viajero.
+- **No se eliminó ninguna fila.** El dataset entra y sale con 161,036 registros.
+- **No se imputó nada:** no hay valores faltantes en ninguna columna.
+
+#### Unificación de variantes de capitalización
+
+La columna `País` traía **13 países escritos de dos formas distintas**, con la
+misma ortografía pero distinta capitalización. Cada par se unificó tomando como
+canónica la **variante más frecuente**, que en todos los casos resultó ser la
+ortográficamente correcta:
+
+| Variante corregida | Canónico | Filas afectadas |
+|---|---|---|
+| `Reino Unido De Gran Bretaña E Irlanda Del Norte` | `Reino Unido de Gran Bretaña e Irlanda del Norte` | 9 |
+| `Federación De Rusia` | `Federación de Rusia` | 5 |
+| `Venezuela (República Bolivariana De)` | `Venezuela (República Bolivariana de)` | 5 |
+| `República De Corea` | `República de Corea` | 12 |
+| `Bolivia (Estado Plurinacional De)` | `Bolivia (Estado Plurinacional de)` | 2 |
+| `Micronesia (Estados Federados De)` | `Micronesia (Estados Federados de)` | 4 |
+| `Trinidad Y Tobago` | `Trinidad y Tobago` | 4 |
+| `República De Moldova` | `República de Moldova` | 1 |
+| `Côte D'ivoire` | `Côte d'Ivoire` | 1 |
+| `Irán (República Islámica Del)` | `Irán (República Islámica del)` | 1 |
+| `San Cristóbal Y Nieves` | `San Cristóbal y Nieves` | 2 |
+| `Antigua Y Barbuda` | `Antigua y Barbuda` | 2 |
+| `Otros Paises Del Mundo` | `OTROS PAISES DEL MUNDO` | 3 |
+
+**Efecto:** el conteo de países distintos pasa de **235 a 222**. El volumen mal
+asignado era pequeño (~400 viajeros en total), pero sin corregirlo un mismo país
+aparecería partido en dos filas de cualquier ranking o gráfica de EDA. Ninguna de
+las variantes afecta a los tres países del Top 3, que quedan intactos.
+
+Ninguna otra columna categórica presentó variantes de este tipo.
+
+#### Duplicados: las 22 repeticiones de clave **no** son duplicados
+
+La hoja `Notas` declara que hay una fila por combinación de mes, vía, frontera,
+país y tipo de viajero. Al verificarlo aparecen **22 combinaciones repetidas
+(42 filas, 138,760 viajeros, concentradas en 2020–2022)**.
+
+No son duplicados: esas filas **se diferencian en `Agrupación Residencia`**, es
+decir, la fuente desagregó un mismo flujo en dos residencias distintas. Por
+ejemplo, los turistas de Guatemala por vía aérea en mayo 2022 aparecen partidos
+en `Guatemala` (50,211) y `Resto de mundo` (1,932).
+
+**La clave realmente única es la declarada + `Agrupación Residencia`** — con ella
+hay 0 repeticiones, y también hay 0 filas idénticas en todas sus columnas.
+
+Por eso **se conservan**: eliminarlas descartaría viajeros reales. Tampoco
+afectan al análisis, porque las series se construyen sumando por mes y las filas
+desagregadas suman exactamente igual que si vinieran juntas.
+
+#### Categoría contaminante
+
+`Cruceristas` es un **tipo de viajero**, pero la fuente lo colocó además como si
+fuera un país y una región (196 filas en `País` y 196 en `Región dos`). Se
+**etiqueta y se reporta**, pero no se borra: se excluye al construir series por
+país o por región, y se conserva para poder estudiarlo como tipo de viajero.
+
+#### Lo que esta etapa deliberadamente NO hace
+
+- **No filtra por tipo de viajero.** El filtro `Turista + Excursionista` es una
+  decisión de análisis y vive en `03_series.py`. El dataset limpio conserva todos
+  los tipos porque el análisis exploratorio los necesita para mostrar el quiebre
+  de 2023.
+- **No trata los valores atípicos.** Los de 2020 son reales (la pandemia), no
+  errores de captura. Decidir qué hacer con ellos es parte del análisis, no de la
+  limpieza.
 
 ---
 
@@ -107,9 +166,9 @@ por el quiebre de la categoría `Viajero` descrito en §1.2.
 | Archivo | Contenido | Filtro aplicado |
 |---|---|---|
 | `S0_total.csv` | Total mensual de viajeros internacionales *(serie obligatoria)* | ninguno |
-| `S1_aerea.csv` | Ingresos por vía aérea | `Vía = Aérea` |
-| `S2_terrestre.csv` | Ingresos por vía terrestre | `Vía = Terrestre` |
-| `S3_maritima.csv` | Ingresos por vía marítima | `Vía = Marítima` |
+| `S1_la_aurora.csv` | Ingresos por el aeropuerto La Aurora | `Frontera = 01 La Aurora` |
+| `S2_valle_nuevo.csv` | Ingresos por la frontera Valle Nuevo | `Frontera = 07 Valle Nuevo` |
+| `S3_san_cristobal.csv` | Ingresos por la frontera San Cristóbal | `Frontera = 09 San Cristóbal` |
 | `S4_el_salvador.csv` | Residentes de El Salvador | `País = El Salvador` |
 | `S5_estados_unidos.csv` | Residentes de Estados Unidos | `País = Estados Unidos de América` |
 | `S6_honduras.csv` | Residentes de Honduras | `País = Honduras` |
@@ -118,6 +177,18 @@ por el quiebre de la categoría `Viajero` descrito en §1.2.
 `S0_total_todos_tipos` no es una de las siete series del enunciado. Existe solo
 para la gráfica de contexto del análisis exploratorio: muestra el escalón
 artificial de 2023 y justifica la decisión de trabajar con visitantes.
+
+### Criterio de selección del Top 3 de fronteras
+
+Igual que en países: **total acumulado durante todo el período**. Las tres
+seleccionadas concentran el grueso del flujo y no tienen ningún mes vacío en los
+210 del período.
+
+> **Nota:** la segunda categoría iba a ser *Vías de ingreso*, pero se descartó.
+> Bajo el filtro de visitantes la serie Marítima vale **cero exacto desde 2017**
+> (114 de 210 meses en cero), porque desde ese año los arribos marítimos se
+> registran casi solo como *Cruceristas*. Una serie así no admite descomposición,
+> prueba de Dickey-Fuller ni modelado. Ver el `README.md` para el detalle.
 
 ### Criterio de selección del Top 3 de países
 
