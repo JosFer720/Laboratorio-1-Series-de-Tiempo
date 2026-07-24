@@ -29,8 +29,8 @@ TIPOS_VISITANTE = ["Turista", "Excursionista"]
 
 VALOR_CONTAMINANTE = "Cruceristas"
 
-PAIS_EXCLUIDO = "Guatemala"
-TOP_PAISES = ["El Salvador", "Estados Unidos de América", "Honduras"]
+PAIS_CASO_ESPECIAL = "Guatemala"
+TOP_PAISES = ["El Salvador", "Guatemala", "Estados Unidos de América"]
 
 TOP_FRONTERAS = ["01 La Aurora", "07 Valle Nuevo", "09 San Cristóbal"]
 
@@ -41,7 +41,7 @@ SERIES = {
     "S3_san_cristobal":   ("Frontera", "09 San Cristóbal"),
     "S4_el_salvador":     ("País", "El Salvador"),
     "S5_estados_unidos":  ("País", "Estados Unidos de América"),
-    "S6_honduras":        ("País", "Honduras"),
+    "S6_guatemala":       ("País", "Guatemala"),
 }
 
 SERIE_CONTEXTO = "S0_total_todos_tipos"

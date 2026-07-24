@@ -55,7 +55,7 @@ afirmar(
 
 for grupo, nombres in [
     ("fronteras", ["S1_la_aurora", "S2_valle_nuevo", "S3_san_cristobal"]),
-    ("paises",    ["S4_el_salvador", "S5_estados_unidos", "S6_honduras"]),
+    ("paises",    ["S4_el_salvador", "S5_estados_unidos", "S6_guatemala"]),
 ]:
     suma = sum(construidas[n] for n in nombres)
     afirmar(
