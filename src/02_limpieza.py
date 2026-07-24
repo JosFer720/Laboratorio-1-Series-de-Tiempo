@@ -14,8 +14,8 @@ CATEGORICAS = [
 CLAVE_DECLARADA = ["fecha", "Vía", "Frontera", "País", "Tipo de Viajero"]
 
 
+# Normaliza un texto para comparar sus variantes.
 def llave_texto(valor):
-    """Reduce un texto a su forma comparable: sin tildes, sin case, sin espacios."""
     sin_tildes = unicodedata.normalize("NFKD", str(valor).strip().lower())
     return sin_tildes.encode("ascii", "ignore").decode()
 

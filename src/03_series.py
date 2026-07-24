@@ -13,16 +13,16 @@ CALENDARIO = pd.date_range(
 afirmar(len(CALENDARIO) == config.N_MESES, f"el calendario tiene {config.N_MESES} meses")
 
 
+# Agrupa los viajeros por mes y completa el calendario.
 def construir(datos, columna, valor):
-    """Agrega por mes y devuelve una serie alineada al calendario completo."""
     if columna is not None:
         datos = datos[datos[columna] == valor]
     serie = datos.groupby(config.COL_FECHA)["Viajero"].sum()
     return serie.reindex(CALENDARIO, fill_value=0.0)
 
 
+# Valida y guarda una serie mensual.
 def exportar(serie, nombre):
-    """Guarda una serie como CSV de dos columnas y valida su forma."""
     afirmar(len(serie) == config.N_MESES, f"{nombre}: tiene {config.N_MESES} puntos")
     afirmar(serie.notna().all(), f"{nombre}: no tiene valores faltantes")
     afirmar((serie >= 0).all(), f"{nombre}: no tiene valores negativos")

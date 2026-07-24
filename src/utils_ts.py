@@ -29,8 +29,8 @@ def partir_train_test(serie):
     return serie.iloc[:config.N_TRAIN], serie.iloc[config.N_TRAIN:]
 
 
+# Grafica la serie y resalta el cierre por pandemia.
 def graficar_serie(serie, titulo=None, marcar_pandemia=True, ax=None):
-    """Grafica la serie, sombreando el periodo de cierre por pandemia."""
     if ax is None:
         _, ax = plt.subplots(figsize=(13, 4))
 
@@ -98,6 +98,8 @@ def test_estacionariedad(serie, nombre=None, verbose=True):
     resultado = {
         "serie": nombre,
         "adf_estadistico": adf[0], "adf_p": adf[1],
+        "adf_rezagos": adf[2], "adf_observaciones": adf[3],
+        "adf_valores_criticos": adf[4],
         "kpss_estadistico": kpss_stat, "kpss_p": kpss_p,
         "adf_estacionaria": adf_estacionaria,
         "kpss_estacionaria": kpss_estacionaria,
@@ -107,6 +109,7 @@ def test_estacionariedad(serie, nombre=None, verbose=True):
     if verbose:
         print(f"--- estacionariedad: {nombre} ---")
         print(f"  ADF : estadistico={adf[0]:>8.4f}  p={adf[1]:.4f}  "
+              f"rezagos={adf[2]}  "
               f"-> {'estacionaria' if adf_estacionaria else 'NO estacionaria'}")
         print(f"  KPSS: estadistico={kpss_stat:>8.4f}  p={kpss_p:.4f}  "
               f"-> {'estacionaria' if kpss_estacionaria else 'NO estacionaria'}")
