@@ -67,13 +67,15 @@ Después de ese punto, la serie empieza a recuperarse poco a poco durante 2021 y
 
 ### 4.b Top 10 países de residencia
 
-El Top 3 por número acumulado de viajeros está formado por El Salvador con 14.1 millones, Guatemala con 13.9 millones y Estados Unidos con 7.0 millones. Sin embargo, en el caso de Guatemala esos registros corresponden a residentes guatemaltecos que regresan al país y no a turistas extranjeros. Por esa razón, para el análisis de las series de tiempo no se considera Guatemala y el Top 3 queda conformado por El Salvador, Estados Unidos y Honduras.
+El Top 3 por número acumulado de viajeros está formado por El Salvador con 14.1 millones, Guatemala con 13.9 millones y Estados Unidos con 7.0 millones. Para seguir literalmente el criterio del enunciado, estos tres países se conservan en el análisis. En el caso de Guatemala, los registros corresponden principalmente a residentes guatemaltecos que regresan al país, por lo que esta serie debe interpretarse como movilidad de retorno y no como turismo extranjero.
+
+Guatemala deja de aparecer como categoría individual desde enero de 2023, por lo que su serie presenta 42 meses consecutivos en cero hasta junio de 2026. Este tramo se debe al cambio de granularidad de la variable `País` y no representa la desaparición real del retorno de residentes. La limitación deberá considerarse al transformar, modelar y evaluar S6.
 
 También se puede ver que existe una fuerte concentración regional, ya que los cuatro países con mayor cantidad de viajeros son El Salvador, Guatemala, Estados Unidos y Honduras. Esto indica que la mayor parte de los visitantes proviene de Centroamérica y Norteamérica, por lo que el mercado emisor no está muy diversificado.
 
 ![Top 10 países de residencia](img/1b_top_paises.png)
 
-*Figura 2. Ranking acumulado construido sobre Turista + Excursionista. Guatemala se muestra como anomalía analítica y se excluye de las series de turismo receptivo.*
+*Figura 2. Ranking acumulado construido sobre Turista + Excursionista. Guatemala se resalta como un caso de interpretación especial, pero se conserva por pertenecer al Top 3 literal.*
 
 ### 4.c Top regiones
 

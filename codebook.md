@@ -51,7 +51,8 @@ independientes entre sí.
 - **Cambio de granularidad en `País` desde 2023.** De 2009 a 2022 la columna trae
   país individual (226 posibles). Desde 2023 la fuente reporta por agrupación de
   mercado (27 grupos, con etiquetas como *Otros Países de Europa* o *Resto del
-  Mundo*). Los mercados principales siguen siendo comparables como serie.
+  Mundo*). No todos los nombres anteriores permanecen como categorías
+  individuales; Guatemala deja de aparecer desde enero de 2023.
 - **`Cruceristas` contamina las columnas `País` y `Región dos`**, donde aparece
   como si fuera un país o una región. Es una categoría de tipo de viajero
   colocada en el nivel equivocado.
@@ -171,7 +172,7 @@ por el quiebre de la categoría `Viajero` descrito en §1.2.
 | `S3_san_cristobal.csv` | Ingresos por la frontera San Cristóbal | `Frontera = 09 San Cristóbal` |
 | `S4_el_salvador.csv` | Residentes de El Salvador | `País = El Salvador` |
 | `S5_estados_unidos.csv` | Residentes de Estados Unidos | `País = Estados Unidos de América` |
-| `S6_honduras.csv` | Residentes de Honduras | `País = Honduras` |
+| `S6_guatemala.csv` | Residentes de Guatemala que regresan al país | `País = Guatemala` |
 | `S0_total_todos_tipos.csv` | **Auxiliar.** Total con *todos* los tipos de viajero | ninguno (sin filtro de tipo) |
 
 `S0_total_todos_tipos` no es una de las siete series del enunciado. Existe solo
@@ -193,9 +194,16 @@ seleccionadas concentran el grueso del flujo y no tienen ningún mes vacío en l
 ### Criterio de selección del Top 3 de países
 
 Basado en el **total acumulado durante todo el período**, como pide el enunciado
-(no en un año específico). Por acumulado el Top 3 sería El Salvador, Guatemala y
-Estados Unidos, pero **`Guatemala` se excluye**: son residentes guatemaltecos
-retornando, no turismo receptivo. Ver la justificación completa en el `README.md`.
+(no en un año específico). El Top 3 utilizado es El Salvador, Guatemala y
+Estados Unidos. `Guatemala` se conserva para cumplir el criterio literal, pero
+se interpreta como retorno de residentes y no como turismo extranjero. Ver la
+justificación completa en el `README.md`.
+
+> **Limitación de S6:** Guatemala registra 42 meses consecutivos en cero entre
+> enero de 2023 y junio de 2026 porque deja de reportarse como categoría
+> individual. Esos ceros corresponden a un cambio de clasificación y no a una
+> caída real. Para transformarla debe utilizarse una opción compatible con
+> ceros, como `log1p`, y la evaluación debe reconocer este quiebre.
 
 ### Partición entrenamiento / prueba
 

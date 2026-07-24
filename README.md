@@ -84,8 +84,9 @@ condicionan todo el análisis:
    una caída real de turismo.
 2. **Cambio de granularidad en `País` desde 2023.** Hasta 2022 se reporta país
    individual (226 valores); desde 2023, agrupación de mercado (27 grupos). Los
-   mercados principales (El Salvador, EE.UU., Honduras, México) siguen siendo
-   comparables como serie; los países pequeños quedan absorbidos.
+   nombres principales no siempre se conservan: Guatemala deja de aparecer
+   como categoría individual desde enero de 2023 y su serie queda en cero. Los
+   países pequeños también pueden quedar absorbidos en grupos de mercado.
 3. **Vía Marítima pierde detalle desde 2017** por un cambio de registro.
 4. **Cruceristas solo existe hasta 2022**; desde 2023 se miden por fuente
    portuaria externa y no figuran.
@@ -111,8 +112,9 @@ categorías. Se eligieron **Fronteras (Top 3)** y **Países de residencia (Top 3
   terrestres— y las tres series están completas: **ningún mes vacío en los 210**.
   Es además directamente accionable: indica dónde invertir en capacidad e
   infraestructura de atención.
-- **Países** es el mercado emisor, y los principales se mantienen comparables
-  pese al cambio de granularidad de 2023.
+- **Países** permite seguir los principales lugares de residencia. El cambio de
+  granularidad de 2023 se documenta por separado porque afecta especialmente a
+  Guatemala.
 
 Las dos categorías son **ortogonales**: una mide *de dónde vienen* los viajeros
 y la otra *por dónde entran*. Eso evita que ambas respondan la misma pregunta y
@@ -130,16 +132,18 @@ y que además desaparecen del dataset a partir de 2023. Una serie con diez años
 consecutivos de ceros no admite descomposición, prueba de Dickey-Fuller ni
 modelado ARIMA, así que la categoría se descartó y se documentó el hallazgo.
 
-### Se excluye `Guatemala` del Top 3 de países
+### Top 3 literal y caso especial de `Guatemala`
 
-Por volumen acumulado, el Top 3 sería El Salvador (16.2M), **Guatemala (14.8M)**
-y Estados Unidos (7.0M). Pero los registros bajo `Guatemala` en la columna `País`
-son **residentes guatemaltecos retornando al país**: no son turismo receptivo,
-que es el fenómeno que se quiere modelar y sobre el que INGUAT toma decisiones.
-
-Incluirlos mezclaría dos fenómenos con dinámicas distintas (turismo internacional
-vs. movilidad de nacionales) en una misma serie. Por eso el Top 3 usado es
-**El Salvador, Estados Unidos y Honduras**.
+Por volumen acumulado sobre Turista + Excursionista, el Top 3 es El Salvador
+(14.1M), **Guatemala (13.9M)** y Estados Unidos (7.0M). Para seguir
+literalmente el criterio del enunciado,
+estas son las tres series de la categoría Países. No obstante, los registros
+bajo `Guatemala` corresponden principalmente a **residentes guatemaltecos que
+regresan al país**, por lo que se analizan como movilidad de retorno y no como
+turismo extranjero. Además, Guatemala deja de aparecer como categoría
+individual desde enero de 2023, por lo que S6 tiene 42 meses consecutivos en
+cero hasta junio de 2026. Ese tramo es un quiebre de registro, no una
+desaparición real del movimiento de residentes.
 
 ### Las series se construyen sobre `Turista + Excursionista`
 
@@ -160,7 +164,7 @@ Siete series mensuales (`MS`, período estacional 12), de enero 2009 a junio 202
 |---|---|
 | `S0_total` | Total mensual de viajeros internacionales *(obligatoria)* |
 | `S1_la_aurora`, `S2_valle_nuevo`, `S3_san_cristobal` | Top 3 fronteras de ingreso |
-| `S4_el_salvador`, `S5_estados_unidos`, `S6_honduras` | Top 3 países de residencia |
+| `S4_el_salvador`, `S5_estados_unidos`, `S6_guatemala` | Top 3 países de residencia |
 
 ### Partición entrenamiento / prueba
 
