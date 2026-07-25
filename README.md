@@ -180,3 +180,32 @@ TEST : abr 2021 – jun 2026   ( 63 meses, 30%)
 > conjunto de prueba cubriendo íntegramente la recuperación. Es consecuencia
 > directa de aplicar la proporción pedida sobre este período, y se analiza
 > explícitamente en el informe.
+
+## Modelado reproducible de S0 y S5
+
+Este bloque analiza S0 y S5, compara ARIMA/SARIMA, Prophet,
+Holt-Winters, suavizamiento exponencial simple y Seasonal Naive, y exporta las
+métricas de los 63 meses de prueba.
+
+Desde la raíz del proyecto:
+
+```bash
+MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
+  .venv/bin/python src/modelado_s0_s5.py
+
+MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
+  .venv/bin/python -m jupyter nbconvert --execute --to notebook \
+  --inplace notebooks/04_modelado_s0_s5.ipynb
+```
+
+Las pruebas de los módulos compartidos se ejecutan con:
+
+```bash
+MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
+  .venv/bin/python -m unittest -v \
+  tests/test_modelos_arima.py tests/test_evaluacion_modelos.py
+```
+
+Los resultados quedan en `data/processed/resultados/`, las figuras en
+`informe/img/final/` y las secciones listas para integrar en
+`informe/secciones/`.
