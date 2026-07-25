@@ -5,6 +5,7 @@ import pandas as pd
 
 import config
 from modelos_arima import (
+    ajustar_arima,
     ajustar_y_pronosticar_arima,
     invertir_transformacion,
     sugerir_auto_arima,
@@ -75,6 +76,25 @@ class ModelosArimaTest(unittest.TestCase):
         self.assertEqual(
             resultado["parametros"]["orden_estacional"],
             (0, 1, 1, 12),
+        )
+
+    def test_residuos_excluyen_el_periodo_de_inicializacion(self):
+        resultado = ajustar_arima(
+            train=self.train,
+            orden=(1, 1, 1),
+            transformacion="log",
+            nombre_serie="S0_total",
+        )
+        burn_in = resultado["ajuste"].loglikelihood_burn
+
+        self.assertGreater(burn_in, 0)
+        self.assertEqual(
+            len(resultado["residuos"]),
+            len(self.train) - burn_in,
+        )
+        self.assertEqual(
+            resultado["residuos"].index[0],
+            self.train.index[burn_in],
         )
 
     def test_auto_arima_devuelve_ordenes_y_metricas(self):

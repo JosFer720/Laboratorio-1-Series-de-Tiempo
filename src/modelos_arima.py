@@ -104,6 +104,9 @@ def ajustar_arima(
         index=train_transformado.index,
         name=f"residuos_{serie_nombre or 'serie'}",
     )
+    burn_in = int(getattr(ajuste, "loglikelihood_burn", 0))
+    if burn_in:
+        residuos = residuos.iloc[burn_in:].copy()
 
     return {
         "serie": serie_nombre,
