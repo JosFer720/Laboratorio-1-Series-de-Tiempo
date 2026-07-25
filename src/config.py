@@ -4,6 +4,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 DIR_RAW = RAIZ / "data" / "raw"
 DIR_PROCESSED = RAIZ / "data" / "processed"
 DIR_SERIES = DIR_PROCESSED / "series"
+DIR_RESULTADOS = DIR_PROCESSED / "resultados"
 
 RUTA_CRUDA   = DIR_RAW / "Base_Migracion_2009-2026jun.xlsx"  # entrada, nunca se modifica
 HOJA_DATOS   = "Datos"

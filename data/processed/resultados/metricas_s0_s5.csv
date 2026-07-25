@@ -1,0 +1,17 @@
+serie,modelo,parametros,transformacion,AIC,BIC,MAE,RMSE,MAPE,Ljung_Box_p,mejor_modelo
+S0_total,Prophet,"{'estacionalidad_anual': True, 'modo_estacional': 'aditivo'}",ninguna,,,132304.63057226443,139548.94753689223,60.88751155003634,8.627193968521057e-76,True
+S0_total,"ARIMA(1,1,1)","{'orden': (1, 1, 1), 'orden_estacional': (0, 0, 0, 0), 'tendencia': None}",log,92.36440459510631,101.2738444938343,154872.62474026007,169524.19007788372,59.30134439691208,0.08238723074607973,False
+S0_total,Suavizamiento exponencial simple,"{'tendencia': None, 'estacionalidad': None}",ninguna,,,165372.5412610855,180598.2333806298,62.905913019189796,2.607610062727666e-14,False
+S0_total,Holt-Winters,"{'tendencia': 'aditiva amortiguada', 'estacionalidad': 'aditiva', 'periodo': 12}",ninguna,,,178161.73894538233,191100.17448241828,69.81798158635122,0.7873741727858574,False
+S0_total,"auto_arima(2, 0, 0)x(1, 0, 1, 12)","{'orden': (2, 0, 0), 'orden_estacional': (1, 0, 1, 12), 'tendencia': None}",log,66.5045660850473,80.95631172615607,183942.72549681764,198150.7392156782,72.24683304956902,0.27680230938729444,False
+S0_total,Seasonal Naive,{'rezago': 12},ninguna,,,207321.6373958207,219663.86935700072,84.91040612875624,9.062573905602722e-83,False
+S0_total,"SARIMA(1,1,1)(0,1,1,12)","{'orden': (1, 1, 1), 'orden_estacional': (0, 1, 1, 12), 'tendencia': None}",log,70.4509810573496,81.60094802847777,213008.1276859091,227938.3372124311,84.09143379795292,0.23413056405489066,False
+S0_total,"SARIMA(2,1,1)(1,1,0,12)","{'orden': (2, 1, 1), 'orden_estacional': (1, 1, 0, 12), 'tendencia': None}",log,62.7991417661614,76.73660048007163,222189.54485213687,241913.93250254286,84.57078733766713,0.4112318957250393,False
+S5_estados_unidos,"ARIMA(1,1,1)","{'orden': (1, 1, 1), 'orden_estacional': (0, 0, 0, 0), 'tendencia': None}",log1p,431.9073700867675,440.8168099854955,22974.8341237689,26793.523998946082,47.08236987762478,0.0014992519355542554,True
+S5_estados_unidos,Prophet,"{'estacionalidad_anual': True, 'modo_estacional': 'aditivo'}",ninguna,,,30361.667465224607,34043.66974367614,61.31471902062026,3.8820874165173466e-58,False
+S5_estados_unidos,Holt-Winters,"{'tendencia': 'aditiva amortiguada', 'estacionalidad': 'aditiva', 'periodo': 12}",ninguna,,,31255.36335875938,34099.4332091383,65.24104865633838,0.4530162745453695,False
+S5_estados_unidos,Suavizamiento exponencial simple,"{'tendencia': None, 'estacionalidad': None}",ninguna,,,32301.745603026393,36174.07677670556,64.28462165922461,3.444531268570664e-23,False
+S5_estados_unidos,"auto_arima(0, 1, 0)x(0, 1, 0, 12)","{'orden': (0, 1, 0), 'orden_estacional': (0, 1, 0, 12), 'tendencia': None}",log1p,401.65846215543576,404.5488112836575,34754.97884264001,38984.73982381542,77.77757632708436,0.00010551779514264029,False
+S5_estados_unidos,"SARIMA(1,1,1)(0,1,1,12)","{'orden': (1, 1, 1), 'orden_estacional': (0, 1, 1, 12), 'tendencia': None}",log1p,376.8823358775853,388.0323028487135,36709.2640944224,40429.451785746794,78.86094334271341,0.0002337911656626295,False
+S5_estados_unidos,Seasonal Naive,{'rezago': 12},ninguna,,,40733.3470426588,43733.35991091356,88.68617199202392,1.2975993467525953e-67,False
+S5_estados_unidos,"SARIMA(2,1,1)(1,1,0,12)","{'orden': (2, 1, 1), 'orden_estacional': (1, 1, 0, 12), 'tendencia': None}",log1p,366.865342438374,380.80280115228425,227296746997017.97,1354351378377763.8,334719665100.08295,0.0031144094257938935,False

@@ -1,0 +1,76 @@
+{
+  "S0_total": {
+    "serie": "S0_total",
+    "etiqueta": "S0 — Total mensual",
+    "inicio": "2009-01-01",
+    "fin": "2026-06-01",
+    "frecuencia": "mensual (m=12)",
+    "n_total": 210,
+    "n_train": 147,
+    "n_test": 63,
+    "inicio_train": "2009-01-01",
+    "fin_train": "2021-03-01",
+    "inicio_test": "2021-04-01",
+    "fin_test": "2026-06-01",
+    "min_train": 9779.0,
+    "max_train": 449114.0705001674,
+    "media_train": 214217.90043370277,
+    "media_test": 241617.1670279873,
+    "ceros_train": 0,
+    "fuerza_estacional": 0.4667706936049656,
+    "fuerza_tendencia": 0.8214721064770694,
+    "transformacion": "log",
+    "orden_auto": [
+      2,
+      0,
+      0
+    ],
+    "orden_estacional_auto": [
+      1,
+      0,
+      1,
+      12
+    ],
+    "mejor_modelo": "Prophet",
+    "mejor_MAE": 132304.63057226443,
+    "mejor_RMSE": 139548.94753689223,
+    "mejor_MAPE": 60.88751155003634
+  },
+  "S5_estados_unidos": {
+    "serie": "S5_estados_unidos",
+    "etiqueta": "S5 — Estados Unidos",
+    "inicio": "2009-01-01",
+    "fin": "2026-06-01",
+    "frecuencia": "mensual (m=12)",
+    "n_total": 210,
+    "n_train": 147,
+    "n_test": 63,
+    "inicio_train": "2009-01-01",
+    "fin_train": "2021-03-01",
+    "inicio_test": "2021-04-01",
+    "fin_test": "2026-06-01",
+    "min_train": 0.0,
+    "max_train": 54288.0,
+    "media_train": 27681.96183415729,
+    "media_test": 45975.10032181435,
+    "ceros_train": 5,
+    "fuerza_estacional": 0.7044458927793809,
+    "fuerza_tendencia": 0.7090653938346487,
+    "transformacion": "log1p",
+    "orden_auto": [
+      0,
+      1,
+      0
+    ],
+    "orden_estacional_auto": [
+      0,
+      1,
+      0,
+      12
+    ],
+    "mejor_modelo": "ARIMA(1,1,1)",
+    "mejor_MAE": 22974.8341237689,
+    "mejor_RMSE": 26793.523998946082,
+    "mejor_MAPE": 47.08236987762478
+  }
+}

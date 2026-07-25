@@ -1,0 +1,11 @@
+serie,transformacion,ADF,p_ADF,KPSS,p_KPSS,veredicto
+S0_total,Nivel,-2.364366320600686,0.15204729499110847,0.40192542336895964,0.07632524854786223,"resultado mixto: KPSS dice estacionaria, ADF no"
+S0_total,log,-2.4992890826669543,0.11564739445738559,0.17495527410006975,0.1,"resultado mixto: KPSS dice estacionaria, ADF no"
+S0_total,log + d=1,-3.085289967003745,0.027661123195754898,0.05088958590973488,0.1,estacionaria (ambas pruebas coinciden)
+S0_total,log + D=1,0.06574005676945142,0.9636426521083662,0.5544421913302717,0.029404911862551408,NO estacionaria (ambas pruebas coinciden)
+S0_total,log + d=1 + D=1,-6.538597046661905,9.470702986370554e-09,0.037212406200131935,0.1,estacionaria (ambas pruebas coinciden)
+S5_estados_unidos,Nivel,-3.185849959420795,0.020818488618028798,0.1819438314358462,0.1,estacionaria (ambas pruebas coinciden)
+S5_estados_unidos,log1p,-2.655473429859212,0.08206527338550157,0.32337875969322716,0.1,"resultado mixto: KPSS dice estacionaria, ADF no"
+S5_estados_unidos,log1p + d=1,-2.8722044332714467,0.048677034629886706,0.020537625839650846,0.1,estacionaria (ambas pruebas coinciden)
+S5_estados_unidos,log1p + D=1,-0.27743752976021796,0.9286396232340961,0.4360673017526222,0.0616089216583525,"resultado mixto: KPSS dice estacionaria, ADF no"
+S5_estados_unidos,log1p + d=1 + D=1,-5.31812860543646,5.0215295724775125e-06,0.024841957853543695,0.1,estacionaria (ambas pruebas coinciden)

@@ -20,7 +20,8 @@ __pycache__/
 
 # ------------------------------------------------------------
 # Datos generados. Son reproducibles corriendo el pipeline, asi
-# que no se versionan... con UNA excepcion: las series finales.
+# que no se versionan... con dos excepciones: las series finales
+# y los resultados resumidos del modelado.
 #
 # Se excluye el CONTENIDO de processed/ y no la carpeta, porque
 # git no vuelve a incluir archivos que esten dentro de un
@@ -34,6 +35,7 @@ __pycache__/
 # ------------------------------------------------------------
 data/processed/*
 !data/processed/series/
+!data/processed/resultados/
 
 # Los datos crudos (data/raw/) SI se versionan: son la fuente de
 # verdad del proyecto y nunca se modifican.
