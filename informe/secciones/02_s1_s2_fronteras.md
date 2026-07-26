@@ -1,4 +1,6 @@
-# S1 y S2 — Fronteras: La Aurora y Valle Nuevo
+> **Nota de integración:** este archivo conserva el fragmento S1–S2 preparado para el avance. Para la entrega del Bloque B, la versión canónica y actualizada —con S1, S2, S3 y el comparativo entre fronteras— es la sección 7 de `informe/informe_final.md`, complementada por `informe/secciones/03_s3_comparativo_fronteras.md`. Este fragmento no debe ensamblarse de forma aislada en la entrega final.
+
+# S1 y S2 — Fronteras: La Aurora y Valle Nuevo (fragmento histórico del avance)
 
 ## S1 — La Aurora
 

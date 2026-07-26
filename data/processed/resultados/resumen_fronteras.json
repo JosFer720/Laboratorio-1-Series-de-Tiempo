@@ -83,9 +83,9 @@
     "mejor_RMSE": 23186.82186561063,
     "mejor_MAPE": 157.64462957504745
   },
-  "S6_guatemala": {
-    "serie": "S6_guatemala",
-    "etiqueta": "S6 — Guatemala",
+  "S3_san_cristobal": {
+    "serie": "S3_san_cristobal",
+    "etiqueta": "S3 — San Cristóbal",
     "inicio": "2009-01-01",
     "fin": "2026-06-01",
     "frecuencia": "mensual (m=12)",
@@ -96,33 +96,33 @@
     "fin_train": "2021-03-01",
     "inicio_test": "2021-04-01",
     "fin_test": "2026-06-01",
-    "min_train": 9779.0,
-    "max_train": 198429.0000000001,
-    "media_train": 82462.92073424907,
-    "media_test": 27751.460317460318,
+    "min_train": 14.0,
+    "max_train": 53127.00000000005,
+    "media_train": 18586.144997119573,
+    "media_test": 23039.180817336433,
     "ceros_train": 0,
-    "ceros_test": 42,
-    "fuerza_estacional": 0.5064148496078714,
-    "fuerza_tendencia": 0.8403839589769371,
-    "correlacion_media_desviacion_nivel": 0.8295252006975308,
-    "correlacion_media_desviacion_transformada": -0.5921284287932362,
+    "ceros_test": 0,
+    "fuerza_estacional": 0.3987148715658101,
+    "fuerza_tendencia": 0.7067462719849692,
+    "correlacion_media_desviacion_nivel": 0.5289911096404964,
+    "correlacion_media_desviacion_transformada": -0.46756668101256194,
     "modelo_descomposicion_preferido": "multiplicative",
-    "transformacion": "log1p",
-    "razonamiento_ordenes": "Se conserva la especificación ya integrada para S6, fuera del comparativo de Fronteras.",
+    "transformacion": "log",
+    "razonamiento_ordenes": "Tras d=1, ACF y PACF presentan su señal principal negativa en lag 1. Por eso se comparan términos AR(1), MA(1), su combinación y un SARIMA anual para verificar si la estacionalidad agrega valor.",
     "orden_auto": [
-      1,
+      2,
       0,
       1
     ],
     "orden_estacional_auto": [
       1,
       0,
-      1,
+      0,
       12
     ],
-    "mejor_modelo": "SARIMA(1,1,1)(0,1,1,12)",
-    "mejor_MAE": 27316.8366313953,
-    "mejor_RMSE": 47260.24579783955,
-    "mejor_MAPE": 66.21698873162262
+    "mejor_modelo": "Prophet",
+    "mejor_MAE": 7723.294813509721,
+    "mejor_RMSE": 10437.106854494128,
+    "mejor_MAPE": 146.89122886290173
   }
 }

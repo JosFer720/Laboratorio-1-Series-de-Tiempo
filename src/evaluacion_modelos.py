@@ -4,6 +4,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.stats import jarque_bera
 from statsmodels.stats.diagnostic import acorr_ljungbox
 
 
@@ -18,6 +19,7 @@ COLUMNAS_RESULTADOS = [
     "RMSE",
     "MAPE",
     "Ljung_Box_p",
+    "Jarque_Bera_p",
     "mejor_modelo",
 ]
 
@@ -73,7 +75,7 @@ def calcular_metricas(y_real, y_pred):
     }
 
 
-# Resume residuos y prueba si conservan autocorrelación hasta el rezago indicado.
+# Resume residuos y comprueba autocorrelación y normalidad.
 def diagnosticar_residuos(residuos, lags=12):
     serie = pd.Series(residuos, dtype=float).replace(
         [np.inf, -np.inf], np.nan
@@ -83,12 +85,16 @@ def diagnosticar_residuos(residuos, lags=12):
 
     rezago = min(int(lags), max(1, len(serie) // 5))
     prueba = acorr_ljungbox(serie, lags=[rezago], return_df=True)
+    normalidad = jarque_bera(serie)
     return {
         "n_residuos": int(len(serie)),
         "media_residuos": float(serie.mean()),
         "desviacion_residuos": float(serie.std(ddof=1)),
+        "asimetria_residuos": float(serie.skew()),
+        "curtosis_exceso_residuos": float(serie.kurt()),
         "Ljung_Box_lag": rezago,
         "Ljung_Box_p": float(prueba["lb_pvalue"].iloc[-1]),
+        "Jarque_Bera_p": float(normalidad.pvalue),
     }
 
 
@@ -108,7 +114,7 @@ def construir_resultado(
     diagnostico = (
         diagnosticar_residuos(residuos)
         if residuos is not None
-        else {"Ljung_Box_p": np.nan}
+        else {"Ljung_Box_p": np.nan, "Jarque_Bera_p": np.nan}
     )
     return {
         "serie": serie,
@@ -119,6 +125,7 @@ def construir_resultado(
         "BIC": float(bic) if pd.notna(bic) else np.nan,
         **metricas,
         "Ljung_Box_p": diagnostico["Ljung_Box_p"],
+        "Jarque_Bera_p": diagnostico["Jarque_Bera_p"],
         "mejor_modelo": False,
     }
 

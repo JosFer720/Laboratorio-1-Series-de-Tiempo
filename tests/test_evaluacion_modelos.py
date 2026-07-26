@@ -59,6 +59,9 @@ class EvaluacionModelosTest(unittest.TestCase):
 
         self.assertEqual(resultado["n_residuos"], 30)
         self.assertTrue(0 <= resultado["Ljung_Box_p"] <= 1)
+        self.assertTrue(0 <= resultado["Jarque_Bera_p"] <= 1)
+        self.assertIn("asimetria_residuos", resultado)
+        self.assertIn("curtosis_exceso_residuos", resultado)
 
     def test_tabla_marca_un_mejor_modelo_por_serie(self):
         resultados = [

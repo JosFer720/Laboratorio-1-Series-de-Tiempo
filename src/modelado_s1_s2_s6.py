@@ -9,6 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from statsmodels.graphics.gofplots import qqplot
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.holtwinters import ExponentialSmoothing, SimpleExpSmoothing
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -49,6 +50,11 @@ ESPECIFICACIONES = {
         "transformacion": "log",
         "archivo": "s2",
     },
+    "S3_san_cristobal": {
+        "etiqueta": "S3 — San Cristóbal",
+        "transformacion": "log",
+        "archivo": "s3",
+    },
     "S6_guatemala": {
         "etiqueta": "S6 — Guatemala",
         "transformacion": "log1p",
@@ -56,23 +62,67 @@ ESPECIFICACIONES = {
     },
 }
 
-CANDIDATOS_MANUALES = [
-    {
-        "nombre": "ARIMA(1,1,1)",
-        "orden": (1, 1, 1),
-        "orden_estacional": (0, 0, 0, 0),
-    },
-    {
-        "nombre": "SARIMA(1,1,1)(0,1,1,12)",
-        "orden": (1, 1, 1),
-        "orden_estacional": (0, 1, 1, 12),
-    },
-    {
-        "nombre": "SARIMA(2,1,1)(1,1,0,12)",
-        "orden": (2, 1, 1),
-        "orden_estacional": (1, 1, 0, 12),
-    },
-]
+ARIMA_110 = {
+    "nombre": "ARIMA(1,1,0)",
+    "orden": (1, 1, 0),
+    "orden_estacional": (0, 0, 0, 0),
+}
+ARIMA_011 = {
+    "nombre": "ARIMA(0,1,1)",
+    "orden": (0, 1, 1),
+    "orden_estacional": (0, 0, 0, 0),
+}
+ARIMA_111 = {
+    "nombre": "ARIMA(1,1,1)",
+    "orden": (1, 1, 1),
+    "orden_estacional": (0, 0, 0, 0),
+}
+SARIMA_111_011 = {
+    "nombre": "SARIMA(1,1,1)(0,1,1,12)",
+    "orden": (1, 1, 1),
+    "orden_estacional": (0, 1, 1, 12),
+}
+SARIMA_211_110 = {
+    "nombre": "SARIMA(2,1,1)(1,1,0,12)",
+    "orden": (2, 1, 1),
+    "orden_estacional": (1, 1, 0, 12),
+}
+
+CANDIDATOS_POR_SERIE = {
+    "S1_la_aurora": [ARIMA_110, ARIMA_011, ARIMA_111, SARIMA_111_011],
+    "S2_valle_nuevo": [ARIMA_110, ARIMA_011, ARIMA_111, SARIMA_111_011],
+    "S3_san_cristobal": [ARIMA_110, ARIMA_011, ARIMA_111, SARIMA_111_011],
+    "S6_guatemala": [ARIMA_111, SARIMA_111_011, SARIMA_211_110],
+}
+
+RAZONAMIENTO_ORDENES = {
+    "S1_la_aurora": (
+        "Tras d=1 no hay un corte limpio en el primer rezago; ACF y PACF "
+        "conservan picos aislados en 5 y 7 por el choque pandémico. Se "
+        "comparan p,q bajos (1,0), (0,1) y (1,1), más un SARIMA anual."
+    ),
+    "S2_valle_nuevo": (
+        "Tras d=1, ACF y PACF muestran un pico negativo significativo en "
+        "lag 1. Se contrastan ARIMA(1,1,0), ARIMA(0,1,1) y ARIMA(1,1,1); "
+        "la estacionalidad moderada motiva un candidato SARIMA."
+    ),
+    "S3_san_cristobal": (
+        "Tras d=1, ACF y PACF presentan su señal principal negativa en lag "
+        "1. Por eso se comparan términos AR(1), MA(1), su combinación y un "
+        "SARIMA anual para verificar si la estacionalidad agrega valor."
+    ),
+    "S6_guatemala": (
+        "Se conserva la especificación ya integrada para S6, fuera del "
+        "comparativo de Fronteras."
+    ),
+}
+
+NOMBRES_S1_S2_S6 = ("S1_la_aurora", "S2_valle_nuevo", "S6_guatemala")
+NOMBRES_FRONTERAS = (
+    "S1_la_aurora",
+    "S2_valle_nuevo",
+    "S3_san_cristobal",
+)
 
 
 # Convierte objetos de NumPy, pandas y tuplas a valores que JSON puede guardar.
@@ -125,11 +175,9 @@ def evaluar_estacionariedad(train, transformacion):
     return pd.DataFrame(filas)
 
 
-# Adaptadores autónomos de Holt-Winters, suavizamiento simple y Seasonal Naive.
-# Se mantienen aquí, con la misma configuración usada por Persona A, mientras
-# Persona C entrega `src/modelos_exponenciales.py`. Cuando ese módulo sea
-# aceptado, C debe comprobar que sustituirlos no cambia partición, horizonte
-# ni métricas reportadas.
+# Adaptadores homogéneos de Holt-Winters, suavizamiento simple y Seasonal Naive.
+# Conservan la misma partición, horizonte y formato de resultados que ARIMA y
+# Prophet.
 def ajustar_holt_winters(train, test):
     modelo = ExponentialSmoothing(
         train,
@@ -186,7 +234,7 @@ def ajustar_seasonal_naive(train, test):
 
 
 # Sugiere un orden automático acotado y evita duplicar candidatos manuales.
-def preparar_candidatos(train, transformacion):
+def preparar_candidatos(nombre_serie, train, transformacion):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         sugerencia = sugerir_auto_arima(
@@ -198,7 +246,9 @@ def preparar_candidatos(train, transformacion):
             max_Q=1,
         )
 
-    candidatos = [dict(candidato) for candidato in CANDIDATOS_MANUALES]
+    candidatos = [
+        dict(candidato) for candidato in CANDIDATOS_POR_SERIE[nombre_serie]
+    ]
     firma_auto = (
         tuple(sugerencia["orden"]),
         tuple(sugerencia["orden_estacional"]),
@@ -231,7 +281,11 @@ def modelar_serie(nombre_serie):
     transformacion = especificacion["transformacion"]
 
     estacionariedad = evaluar_estacionariedad(train, transformacion)
-    candidatos, sugerencia = preparar_candidatos(train, transformacion)
+    candidatos, sugerencia = preparar_candidatos(
+        nombre_serie,
+        train,
+        transformacion,
+    )
     resultados_arima = ajustar_candidatos_arima(
         train=train,
         candidatos=candidatos,
@@ -317,6 +371,36 @@ def modelar_serie(nombre_serie):
         model="additive",
         period=config.PERIODO_ESTACIONAL,
     )
+    descomposicion_multiplicativa = (
+        seasonal_decompose(
+            train,
+            model="multiplicative",
+            period=config.PERIODO_ESTACIONAL,
+        )
+        if (train > 0).all()
+        else None
+    )
+
+    prepandemia = train[train.index.year <= 2019]
+    anual_nivel = prepandemia.groupby(prepandemia.index.year).agg(
+        ["mean", "std"]
+    )
+    transformada_pre = transformar_serie(prepandemia, transformacion)
+    anual_transformada = transformada_pre.groupby(
+        transformada_pre.index.year
+    ).agg(["mean", "std"])
+    correlacion_nivel = float(
+        anual_nivel["mean"].corr(anual_nivel["std"])
+    )
+    correlacion_transformada = float(
+        anual_transformada["mean"].corr(anual_transformada["std"])
+    )
+    modelo_descomposicion = (
+        "multiplicative"
+        if descomposicion_multiplicativa is not None
+        and correlacion_nivel >= 0.5
+        else "additive"
+    )
 
     resumen = {
         "serie": nombre_serie,
@@ -339,7 +423,11 @@ def modelar_serie(nombre_serie):
         "ceros_test": int((test == 0).sum()),
         "fuerza_estacional": float(fuerza_estacional(descomposicion)),
         "fuerza_tendencia": float(fuerza_tendencia(descomposicion)),
+        "correlacion_media_desviacion_nivel": correlacion_nivel,
+        "correlacion_media_desviacion_transformada": correlacion_transformada,
+        "modelo_descomposicion_preferido": modelo_descomposicion,
         "transformacion": transformacion,
+        "razonamiento_ordenes": RAZONAMIENTO_ORDENES[nombre_serie],
         "orden_auto": sugerencia["orden"],
         "orden_estacional_auto": sugerencia["orden_estacional"],
         "mejor_modelo": mejor["modelo"],
@@ -353,6 +441,7 @@ def modelar_serie(nombre_serie):
         "test": test,
         "estacionariedad": estacionariedad,
         "descomposicion": descomposicion,
+        "descomposicion_multiplicativa": descomposicion_multiplicativa,
         "tabla": tabla,
         "pronosticos": pronosticos,
         "residuos": residuos,
@@ -396,7 +485,7 @@ def guardar_figuras(resultado):
     fig.savefig(DIR_IMG / f"{prefijo}_serie_particion.png", dpi=150)
     plt.close(fig)
 
-    componentes = [
+    componentes_aditivos = [
         (train, "Observada", "#2f6690"),
         (resultado["descomposicion"].trend, "Tendencia", "#c44536"),
         (
@@ -406,12 +495,54 @@ def guardar_figuras(resultado):
         ),
         (resultado["descomposicion"].resid, "Residuo", "#6c757d"),
     ]
-    fig, axes = plt.subplots(4, 1, figsize=(12, 9), sharex=True)
-    for ax, (datos, nombre, color) in zip(axes, componentes):
-        ax.plot(datos.index, datos, color=color, linewidth=1.1)
-        ax.set_ylabel(nombre)
-        ax.grid(alpha=0.22)
-    axes[0].set_title(f"{etiqueta}: descomposición del entrenamiento")
+    multiplicativa = resultado["descomposicion_multiplicativa"]
+    componentes_multiplicativos = (
+        [
+            (train, "Observada", "#2f6690"),
+            (multiplicativa.trend, "Tendencia", "#c44536"),
+            (multiplicativa.seasonal, "Estacionalidad", "#6a994e"),
+            (multiplicativa.resid, "Residuo", "#6c757d"),
+        ]
+        if multiplicativa is not None
+        else None
+    )
+    columnas = 2 if componentes_multiplicativos is not None else 1
+    fig, axes = plt.subplots(
+        4,
+        columnas,
+        figsize=(14 if columnas == 2 else 12, 10),
+        sharex=True,
+        squeeze=False,
+    )
+    for fila, (datos, nombre, color) in enumerate(componentes_aditivos):
+        axes[fila, 0].plot(datos.index, datos, color=color, linewidth=1.0)
+        axes[fila, 0].set_ylabel(nombre)
+        axes[fila, 0].grid(alpha=0.22)
+    axes[0, 0].set_title("Descomposición aditiva")
+    if componentes_multiplicativos is not None:
+        for fila, (datos, nombre, color) in enumerate(
+            componentes_multiplicativos
+        ):
+            axes[fila, 1].plot(
+                datos.index,
+                datos,
+                color=color,
+                linewidth=1.0,
+            )
+            axes[fila, 1].set_ylabel(nombre)
+            axes[fila, 1].grid(alpha=0.22)
+        axes[0, 1].set_title("Descomposición multiplicativa")
+    preferida = {
+        "additive": "aditiva",
+        "multiplicative": "multiplicativa",
+    }[resumen["modelo_descomposicion_preferido"]]
+    fig.suptitle(
+        (
+            f"{etiqueta}: comparación de descomposiciones "
+            f"(preferida: {preferida})"
+        ),
+        y=0.995,
+    )
     fig.tight_layout()
     fig.savefig(DIR_IMG / f"{prefijo}_descomposicion.png", dpi=150)
     plt.close(fig)
@@ -452,12 +583,22 @@ def guardar_figuras(resultado):
     )
     plt.close(fig)
 
-    estacionaria = transformada.diff().diff(12).dropna()
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
-    plot_acf(estacionaria, lags=36, ax=axes[0])
-    plot_pacf(estacionaria, lags=36, ax=axes[1], method="ywm")
-    axes[0].set_title("ACF después de d=1 y D=1")
-    axes[1].set_title("PACF después de d=1 y D=1")
+    regular = transformada.diff().dropna()
+    regular_estacional = regular.diff(12).dropna()
+    fig, axes = plt.subplots(2, 2, figsize=(13, 8))
+    plot_acf(regular, lags=36, ax=axes[0, 0])
+    plot_pacf(regular, lags=36, ax=axes[0, 1], method="ywm")
+    plot_acf(regular_estacional, lags=36, ax=axes[1, 0])
+    plot_pacf(
+        regular_estacional,
+        lags=36,
+        ax=axes[1, 1],
+        method="ywm",
+    )
+    axes[0, 0].set_title("ACF después de d=1")
+    axes[0, 1].set_title("PACF después de d=1")
+    axes[1, 0].set_title("ACF después de d=1 y D=1")
+    axes[1, 1].set_title("PACF después de d=1 y D=1")
     fig.suptitle(f"{etiqueta}: ACF y PACF del entrenamiento", y=0.995)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(
@@ -537,19 +678,39 @@ def guardar_figuras(resultado):
     mejor_arima = candidatos_arima.iloc[0]["modelo"]
     residuo = pd.Series(resultado["residuos"][mejor_arima]).dropna()
     diagnostico = diagnosticar_residuos(residuo)
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
-    axes[0].plot(residuo.index, residuo, color="#6c757d", linewidth=1.0)
-    axes[0].axhline(0, color="#20242b", linewidth=0.9)
-    axes[0].set_title(f"Residuos de {mejor_arima}")
-    axes[0].grid(alpha=0.22)
+    fig, axes = plt.subplots(2, 2, figsize=(13, 8))
+    axes[0, 0].plot(
+        residuo.index,
+        residuo,
+        color="#6c757d",
+        linewidth=1.0,
+    )
+    axes[0, 0].axhline(0, color="#20242b", linewidth=0.9)
+    axes[0, 0].set_title(f"Residuos de {mejor_arima}")
+    axes[0, 0].grid(alpha=0.22)
     plot_acf(
         residuo,
         lags=min(36, len(residuo) // 2 - 1),
-        ax=axes[1],
+        ax=axes[0, 1],
     )
-    axes[1].set_title(
+    axes[0, 1].set_title(
         f"ACF de residuos · Ljung-Box p={diagnostico['Ljung_Box_p']:.3f}"
     )
+    axes[1, 0].hist(
+        residuo,
+        bins=16,
+        color="#9bb7cc",
+        edgecolor="white",
+    )
+    axes[1, 0].set_title(
+        (
+            "Distribución de residuos · "
+            f"Jarque-Bera p={diagnostico['Jarque_Bera_p']:.3f}"
+        )
+    )
+    axes[1, 0].grid(axis="y", alpha=0.22)
+    qqplot(residuo, line="45", ax=axes[1, 1], fit=True)
+    axes[1, 1].set_title("Gráfico Q-Q de normalidad")
     fig.suptitle(f"{etiqueta}: diagnóstico del candidato ARIMA", y=0.995)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(
@@ -560,11 +721,127 @@ def guardar_figuras(resultado):
     plt.close(fig)
 
 
-# Ejecuta S1, S2 y S6, exporta resultados reproducibles y devuelve sus objetos.
-def ejecutar_modelado_s1_s2_s6(guardar=True, generar_figuras=True):
+# Calcula la evidencia homogénea solicitada para comparar las tres fronteras.
+def calcular_comparativo_fronteras(resultados):
+    filas = []
+    for nombre in NOMBRES_FRONTERAS:
+        resultado = resultados[nombre]
+        serie = resultado["serie"]
+        tendencia = resultado["descomposicion"].trend.dropna()
+        tendencia_pre = tendencia[tendencia.index.year <= 2019]
+        eje = np.arange(len(tendencia_pre), dtype=float)
+        pendiente = float(np.polyfit(eje, tendencia_pre.to_numpy(), 1)[0])
+        pendiente_relativa = float(
+            pendiente / tendencia_pre.mean() * 100
+        )
+
+        pre = serie[
+            (serie.index >= "2009-01-01")
+            & (serie.index <= "2019-12-01")
+        ]
+        total_2009 = float(pre[pre.index.year == 2009].sum())
+        total_2019 = float(pre[pre.index.year == 2019].sum())
+        cagr = float((total_2019 / total_2009) ** (1 / 10) - 1) * 100
+        cv = float(pre.std(ddof=1) / pre.mean())
+        volatilidad_log = float(np.log(pre).diff().dropna().std(ddof=1))
+
+        total_2020 = float(serie[serie.index.year == 2020].sum())
+        caida = float((1 - total_2020 / total_2019) * 100)
+        nivel_2019 = float(pre[pre.index.year == 2019].mean())
+        recuperaciones_mensuales = serie[
+            (serie.index > "2020-03-01") & (serie >= nivel_2019)
+        ]
+        primera_recuperacion = (
+            recuperaciones_mensuales.index.min()
+            if not recuperaciones_mensuales.empty
+            else pd.NaT
+        )
+        meses_primera_recuperacion = (
+            (
+                (primera_recuperacion.year - 2020) * 12
+                + primera_recuperacion.month
+                - 3
+            )
+            if pd.notna(primera_recuperacion)
+            else np.nan
+        )
+        media_movil = serie.rolling(12, min_periods=12).mean()
+        recuperaciones = media_movil[
+            (media_movil.index > "2020-03-01")
+            & (media_movil >= nivel_2019)
+        ]
+        fecha_recuperacion = (
+            recuperaciones.index.min()
+            if not recuperaciones.empty
+            else pd.NaT
+        )
+        meses_recuperacion_sostenida = (
+            (
+                (fecha_recuperacion.year - 2020) * 12
+                + fecha_recuperacion.month
+                - 3
+            )
+            if pd.notna(fecha_recuperacion)
+            else np.nan
+        )
+
+        filas.append(
+            {
+                "serie": nombre,
+                "frontera": ESPECIFICACIONES[nombre]["etiqueta"].split("—")[
+                    -1
+                ].strip(),
+                "fuerza_estacional": resultado["resumen"][
+                    "fuerza_estacional"
+                ],
+                "fuerza_tendencia": resultado["resumen"][
+                    "fuerza_tendencia"
+                ],
+                "pendiente_tendencia_viajeros_mes": pendiente,
+                "pendiente_tendencia_relativa_pct_mes": pendiente_relativa,
+                "cagr_2009_2019_pct": cagr,
+                "coeficiente_variacion_2009_2019": cv,
+                "desviacion_log_diferencias_2009_2019": volatilidad_log,
+                "caida_2020_vs_2019_pct": caida,
+                "fecha_primera_recuperacion_mensual": primera_recuperacion,
+                "meses_primera_recuperacion_mensual": (
+                    meses_primera_recuperacion
+                ),
+                "fecha_recuperacion_sostenida_media_movil_2019": (
+                    fecha_recuperacion
+                ),
+                "meses_hasta_recuperacion_sostenida": (
+                    meses_recuperacion_sostenida
+                ),
+            }
+        )
+
+    tabla = pd.DataFrame(filas)
+    tabla["ranking_estacionalidad"] = (
+        tabla["fuerza_estacional"].rank(ascending=False, method="min").astype(int)
+    )
+    tabla["ranking_crecimiento"] = (
+        tabla["cagr_2009_2019_pct"]
+        .rank(ascending=False, method="min")
+        .astype(int)
+    )
+    tabla["ranking_volatilidad"] = (
+        tabla["desviacion_log_diferencias_2009_2019"]
+        .rank(ascending=False, method="min")
+        .astype(int)
+    )
+    tabla["ranking_caida_pandemia"] = (
+        tabla["caida_2020_vs_2019_pct"]
+        .rank(ascending=False, method="min")
+        .astype(int)
+    )
+    return tabla
+
+
+def _ejecutar_modelado(nombres, sufijo, guardar=True, generar_figuras=True):
     resultados = {
         nombre: modelar_serie(nombre)
-        for nombre in ESPECIFICACIONES
+        for nombre in nombres
     }
 
     if guardar:
@@ -574,7 +851,7 @@ def ejecutar_modelado_s1_s2_s6(guardar=True, generar_figuras=True):
             ignore_index=True,
         )
         metricas.to_csv(
-            DIR_RESULTADOS / "metricas_s1_s2_s6.csv",
+            DIR_RESULTADOS / f"metricas_{sufijo}.csv",
             index=False,
         )
 
@@ -591,7 +868,7 @@ def ejecutar_modelado_s1_s2_s6(guardar=True, generar_figuras=True):
             if columna != "serie"
         ]
         estacionariedad[columnas].to_csv(
-            DIR_RESULTADOS / "estacionariedad_s1_s2_s6.csv",
+            DIR_RESULTADOS / f"estacionariedad_{sufijo}.csv",
             index=False,
         )
 
@@ -610,7 +887,7 @@ def ejecutar_modelado_s1_s2_s6(guardar=True, generar_figuras=True):
                     )
                 )
         pd.concat(pronosticos, ignore_index=True).to_csv(
-            DIR_RESULTADOS / "pronosticos_s1_s2_s6.csv",
+            DIR_RESULTADOS / f"pronosticos_{sufijo}.csv",
             index=False,
         )
 
@@ -618,7 +895,7 @@ def ejecutar_modelado_s1_s2_s6(guardar=True, generar_figuras=True):
             nombre: _serializable(resultado["resumen"])
             for nombre, resultado in resultados.items()
         }
-        (DIR_RESULTADOS / "resumen_s1_s2_s6.json").write_text(
+        (DIR_RESULTADOS / f"resumen_{sufijo}.json").write_text(
             json.dumps(resumen, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
@@ -630,8 +907,33 @@ def ejecutar_modelado_s1_s2_s6(guardar=True, generar_figuras=True):
     return resultados
 
 
+def ejecutar_modelado_s1_s2_s6(guardar=True, generar_figuras=True):
+    return _ejecutar_modelado(
+        NOMBRES_S1_S2_S6,
+        "s1_s2_s6",
+        guardar=guardar,
+        generar_figuras=generar_figuras,
+    )
+
+
+def ejecutar_modelado_fronteras(guardar=True, generar_figuras=True):
+    resultados = _ejecutar_modelado(
+        NOMBRES_FRONTERAS,
+        "fronteras",
+        guardar=guardar,
+        generar_figuras=generar_figuras,
+    )
+    comparativo = calcular_comparativo_fronteras(resultados)
+    if guardar:
+        comparativo.to_csv(
+            DIR_RESULTADOS / "comparativo_fronteras.csv",
+            index=False,
+        )
+    return resultados, comparativo
+
+
 if __name__ == "__main__":
-    salida = ejecutar_modelado_s1_s2_s6()
+    salida, comparativo = ejecutar_modelado_fronteras()
     for nombre, resultado in salida.items():
         mejor = resultado["tabla"].loc[
             resultado["tabla"]["mejor_modelo"]
@@ -640,3 +942,5 @@ if __name__ == "__main__":
             f"{nombre}: {mejor['modelo']} · "
             f"MAE={mejor['MAE']:.2f} · RMSE={mejor['RMSE']:.2f}"
         )
+    print("\nComparativo de Fronteras:")
+    print(comparativo.to_string(index=False))

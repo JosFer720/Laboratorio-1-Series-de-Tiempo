@@ -5,15 +5,11 @@
 **Equipo de trabajo:** Persona A, Persona B y Persona C
 **Repositorio:** `Laboratorio-1-Series-de-Tiempo` — enlace pendiente de confirmar en el cierre
 
-> **Estado de este documento:** este es el borrador entregado por Persona B al
-> final de su bloque de la cascada. Integra las secciones ya cerradas de
-> Persona A (metodología general, S0, S5 y hallazgos preliminares) y las
-> propias de Persona B (S1, S2 y S6). Las secciones marcadas como
-> **Pendiente (Persona C)** todavía no existen y deben completarse durante el
-> cierre final: S3, S4, ambos comparativos, la tabla global de métricas, los
-> hallazgos consolidados, las limitaciones finales y las conclusiones. Persona
-> C también debe homogeneizar cifras, decimales y numeración una vez agregue
-> su propio contenido.
+> **Estado de este documento:** los bloques A y B de la Parte II están
+> integrados. S0 y las tres fronteras S1–S3 cuentan con el flujo completo y el
+> comparativo de Fronteras. Para el cierre final todavía falta completar S4,
+> el comparativo de Países, la tabla global, los hallazgos consolidados y las
+> conclusiones.
 
 ---
 
@@ -24,11 +20,10 @@ a Guatemala (S0, total; S1–S3, fronteras; S4–S6, países) a partir de
 `Base_Migracion_2009-2026jun.xlsx`, y compara modelos ARIMA/SARIMA, Prophet,
 Holt-Winters, suavizamiento exponencial simple y Seasonal Naive sobre una
 partición temporal de 147 meses de entrenamiento y 63 de prueba. Hasta este
-punto de la cascada, S0, S1, S2, S5 y S6 tienen el flujo completo: gráfica,
+punto de la cascada, S0, S1, S2, S3, S5 y S6 tienen el flujo completo: gráfica,
 descomposición, estacionariedad, selección de órdenes, ajuste de modelos,
-diagnóstico de residuos y pronóstico de los 63 meses de prueba. S3 y S4, junto
-con los comparativos de Fronteras y Países, quedan pendientes para el cierre
-de Persona C.
+diagnóstico de residuos y pronóstico de los 63 meses de prueba. S4 y el
+comparativo de Países quedan pendientes para el cierre.
 
 ## 1. Descripción del conjunto de datos
 
@@ -345,13 +340,19 @@ crecimiento, aparecían meses altos y bajos que se repetían. El residuo
 aumenta alrededor de la pandemia porque una descomposición tradicional no
 puede explicar por completo un cierre tan abrupto.
 
+Se compararon las formas aditiva y multiplicativa. Entre 2009 y 2019, la
+correlación entre la media y la desviación anual fue 0.904: la amplitud crecía
+con el nivel. Por ello la lectura multiplicativa es más apropiada para S0,
+aunque la fuerza estacional se calcula con la descomposición aditiva para
+mantener la misma fórmula y escala en el comparativo de las siete series.
+
 ![S0: media y variación móvil](img/final/s0_varianza.png)
 
-Como S0 no contiene ceros, se aplicó logaritmo. La transformación reduce el
-peso de los meses con volúmenes muy altos y permite analizar los cambios en
-términos más relativos. Aun así, el quiebre de 2020 continúa siendo visible y
-debe tratarse como un cambio real del contexto, no como un valor atípico que
-deba eliminarse.
+Como S0 no contiene ceros, se aplicó logaritmo. Antes de la pandemia, la
+correlación media-desviación pasó de 0.904 en nivel a -0.438 en logaritmo:
+desapareció la asociación positiva entre nivel y amplitud, evidencia de que la
+transformación estabiliza la varianza. Aun así, el quiebre de 2020 continúa
+visible y debe tratarse como un cambio real, no como un atípico eliminable.
 
 ### Estacionariedad y selección de órdenes
 
@@ -372,11 +373,13 @@ diferencia estacional debía utilizarse obligatoriamente.
 
 ![S0: ACF y PACF](img/final/s0_acf_pacf.png)
 
-La ACF y la PACF de la serie transformada y diferenciada muestran actividad en
-los primeros rezagos y en la zona estacional. Esto justificó comenzar con
-órdenes pequeños, como ARIMA(1,1,1), y contrastarlos con dos alternativas
-SARIMA. También se incluyó la sugerencia acotada de `auto_arima`, que propuso
-un orden regular (2,0,0) y uno estacional (1,0,1,12).
+La figura separa la lectura después de `d=1` de la lectura después de
+`d=1,D=1`. Con `d=1`, la ACF conserva una señal en el rezago 12 y ni ACF ni
+PACF presentan un corte simple en los primeros rezagos. Por eso se tomó
+ARIMA(1,1,1) como candidato parsimonioso y se contrastó con dos SARIMA de
+órdenes bajos. `auto_arima` propuso (2,0,0)(1,0,1,12); se evaluó, pero su
+ausencia de diferenciación no coincide con la conclusión conjunta de ADF y
+KPSS, por lo que no se aceptó automáticamente.
 
 ### Comparación de modelos y pronóstico
 
@@ -413,11 +416,13 @@ elegir un modelo únicamente por su ajuste interno.
 
 Entre los candidatos ARIMA, ARIMA(1,1,1) obtuvo `p=0.082` en la prueba
 resumida de Ljung-Box. Al nivel de 5% no se rechaza la ausencia de
-autocorrelación, aunque el resultado no es especialmente amplio. Su error en
-prueba fue superior al de Prophet y los residuos de Prophet sí conservaron
-autocorrelación. La conclusión es que ningún modelo resuelve por completo el
-cambio de nivel pospandemia: Prophet pronostica menos mal, mientras
-ARIMA(1,1,1) presenta un diagnóstico residual más favorable.
+autocorrelación, aunque el resultado no es especialmente amplio. Jarque-Bera
+da `p<0.001`: los residuos no son normales y el gráfico Q-Q muestra colas
+extremas alrededor de la pandemia. Su error en prueba fue superior al de
+Prophet y los residuos de Prophet sí conservaron autocorrelación. Ningún
+modelo resuelve por completo el cambio de nivel pospandemia: Prophet
+pronostica menos mal, mientras ARIMA(1,1,1) presenta menor autocorrelación
+residual.
 
 ## 7. Categoría Fronteras
 
@@ -440,10 +445,16 @@ curso cuando terminó el entrenamiento.
 La fuerza de tendencia es 0.811 y la fuerza estacional es 0.559. En
 comparación con S0, La Aurora conserva un patrón estacional más marcado,
 coherente con la estacionalidad propia del tráfico aéreo de pasajeros.
+La correlación entre media y desviación anual antes de 2020 fue 0.889, por lo
+que la amplitud aumenta con el nivel y la descomposición multiplicativa es la
+lectura preferida.
 
 ![S1: media y variación móvil](img/final/s1_varianza.png)
 
-Como S1 no contiene ceros, se aplicó logaritmo completo.
+Como S1 no contiene ceros, se aplicó logaritmo completo. La correlación
+media-desviación cambió de 0.889 en nivel a -0.209 después de transformar, de
+modo que el logaritmo elimina la relación positiva que hacía crecer la
+varianza con el nivel.
 
 | Transformación | p ADF | p KPSS | Lectura |
 |---|---:|---:|---|
@@ -455,33 +466,40 @@ Como S1 no contiene ceros, se aplicó logaritmo completo.
 
 ![S1: ACF y PACF](img/final/s1_acf_pacf.png)
 
+Con `d=1` no aparece un corte limpio en el primer rezago; quedan picos aislados
+en los rezagos 5 y 7, muy influidos por el quiebre de 2020. En vez de escoger
+un orden alto y frágil, se compararon las alternativas parsimoniosas
+ARIMA(1,1,0), ARIMA(0,1,1) y ARIMA(1,1,1), más un SARIMA anual. La segunda fila
+de la figura permite revisar por separado los términos estacionales después de
+`D=1`.
+
 | Modelo | AIC | BIC | MAE | RMSE | MAPE |
 |---|---:|---:|---:|---:|---:|
-| ARIMA(1,1,1) | 207.03 | 215.94 | 33,051 | 38,251 | 33.08% |
+| ARIMA(1,1,1) | 207.03 | 215.94 | 33,049 | 38,249 | 33.08% |
+| ARIMA(0,1,1) | 206.07 | 212.01 | 33,468 | 38,659 | 33.42% |
+| ARIMA(1,1,0) | 206.85 | 212.80 | 34,250 | 39,444 | 34.14% |
 | Suavizamiento exponencial simple | N/A | N/A | 36,822 | 42,053 | 36.56% |
-| Holt-Winters | N/A | N/A | 38,906 | 42,889 | 39.49% |
+| Holt-Winters | N/A | N/A | 38,904 | 42,887 | 39.49% |
 | Prophet | N/A | N/A | 45,973 | 50,963 | 47.47% |
-| SARIMA(1,1,1)(0,1,1,12) | 187.11 | 198.26 | 68,213 | 72,424 | 71.997% |
+| SARIMA(1,1,1)(0,1,1,12) | 187.11 | 198.26 | 68,210 | 72,421 | 71.99% |
 | auto_arima(1,0,1)(1,0,1,12) | 189.57 | 204.03 | 71,903 | 75,901 | 76.29% |
 | Seasonal Naive | N/A | N/A | 75,518 | 79,321 | 81.48% |
-| SARIMA(2,1,1)(1,1,0,12) | 180.07 | 194.01 | 1.33×10¹³ | 8.96×10¹³ | inestable |
 
 ![S1: comparación de pronósticos](img/final/s1_pronosticos.png)
 ![S1: RMSE por modelo](img/final/s1_rmse_modelos.png)
 
-ARIMA(1,1,1) obtuvo el menor RMSE (38,251) y el menor MAE (33,051), el error
-relativo más bajo entre las tres series de este bloque (MAPE 33.1%).
-SARIMA(2,1,1)(1,1,0,12) obtuvo el AIC más bajo entre los candidatos
-ARIMA/SARIMA, pero al invertir la transformación logarítmica sobre 63 pasos
-su pronóstico se dispara sin sentido económico; se conserva en la tabla como
-evidencia de por qué fue descartado, el mismo tratamiento que Persona A aplicó
-a un candidato inestable de S5.
+ARIMA(1,1,1) obtuvo el menor RMSE (38,249) y el menor MAE (33,049), con
+MAPE de 33.1%. El AIC ligeramente menor de ARIMA(0,1,1) no se tradujo en menor
+error de prueba, mientras que los candidatos estacionales subestimaron con
+mayor fuerza la recuperación.
 
 ![S1: diagnóstico del candidato ARIMA](img/final/s1_residuos.png)
 
 ARIMA(1,1,1) obtiene `p=0.074` en Ljung-Box; al nivel de 5% no se rechaza la
-ausencia de autocorrelación, aunque el margen es estrecho. Se selecciona como
-el mejor candidato de S1.
+ausencia de autocorrelación, aunque el margen es estrecho. Jarque-Bera arroja
+`p<0.001`, por lo que los residuos no son normales: el histograma y el gráfico
+Q-Q muestran que el choque pandémico genera colas extremas. Se selecciona como
+el mejor candidato de S1 por RMSE, manteniendo esta limitación.
 
 ### 7.2 S2 — Valle Nuevo
 
@@ -502,8 +520,15 @@ entrenamiento.
 La fuerza de tendencia es 0.766, frente a una fuerza estacional de 0.311. A
 diferencia de La Aurora, el tráfico terrestre de Valle Nuevo tiene un patrón
 mensual más plano y un crecimiento de fondo más marcado antes de 2020.
+La correlación media-desviación fue 0.310, bastante menor que en La Aurora;
+por ello la descomposición aditiva es la lectura preferida para S2.
 
 ![S2: media y variación móvil](img/final/s2_varianza.png)
+
+Aunque la relación entre nivel y amplitud es más débil, la escala original
+presenta picos grandes y varianza cambiante. Después del logaritmo la
+correlación media-desviación deja de ser positiva (pasa de 0.310 a -0.539), de
+modo que se conserva la transformación para estabilizar la escala.
 
 | Transformación | p ADF | p KPSS | Lectura |
 |---|---:|---:|---|
@@ -515,16 +540,23 @@ mensual más plano y un crecimiento de fondo más marcado antes de 2020.
 
 ![S2: ACF y PACF](img/final/s2_acf_pacf.png)
 
+Después de `d=1`, tanto la ACF como la PACF muestran un pico negativo
+significativo en el rezago 1. Esto motiva comparar por separado un término
+AR(1), un MA(1) y su combinación: ARIMA(1,1,0), ARIMA(0,1,1) y
+ARIMA(1,1,1). El candidato SARIMA permite comprobar si la estacionalidad
+moderada aporta una mejora real.
+
 | Modelo | AIC | BIC | MAE | RMSE | MAPE |
 |---|---:|---:|---:|---:|---:|
 | Prophet | N/A | N/A | 16,804 | 23,187 | 157.64% |
-| Holt-Winters | N/A | N/A | 35,239 | 38,126 | 85.37% |
+| Holt-Winters | N/A | N/A | 35,210 | 38,091 | 85.43% |
 | Suavizamiento exponencial simple | N/A | N/A | 40,770 | 45,663 | 79.97% |
+| ARIMA(1,1,0) | 330.74 | 336.69 | 41,024 | 45,933 | 80.11% |
+| ARIMA(0,1,1) | 327.55 | 333.49 | 41,314 | 46,240 | 80.30% |
 | ARIMA(1,1,1) | 329.50 | 338.41 | 41,519 | 46,452 | 80.52% |
 | auto_arima(1,0,1)(0,0,0,12) | 330.98 | 339.91 | 43,693 | 48,726 | 84.83% |
 | Seasonal Naive | N/A | N/A | 44,707 | 49,661 | 91.39% |
 | SARIMA(1,1,1)(0,1,1,12) | 303.09 | 314.24 | 47,115 | 51,806 | 96.96% |
-| SARIMA(2,1,1)(1,1,0,12) | 303.19 | 317.13 | 47,228 | 51,923 | 96.88% |
 
 ![S2: comparación de pronósticos](img/final/s2_pronosticos.png)
 ![S2: RMSE por modelo](img/final/s2_rmse_modelos.png)
@@ -538,25 +570,105 @@ de S2 produjo un pronóstico inestable.
 
 ![S2: diagnóstico del candidato ARIMA](img/final/s2_residuos.png)
 
-Los residuos de Prophet conservan autocorrelación (Ljung-Box `p≈0.0000`), a
-pesar de tener el menor error en prueba. ARIMA(1,1,1) tiene el residuo más
-cercano a ruido blanco (`p=0.055`), pero su RMSE duplica al de Prophet.
+Los residuos de Prophet conservan autocorrelación (Ljung-Box `p<0.001`), a
+pesar de tener el menor error en prueba. ARIMA(1,1,0), el ARIMA con menor RMSE,
+tampoco deja ruido blanco (`p=0.014`). ARIMA(1,1,1) queda apenas sobre el
+umbral (`p=0.055`), pero pronostica peor. Jarque-Bera rechaza normalidad en
+todos los candidatos debido a las observaciones extremas de la pandemia.
 
 ### 7.3 S3 — San Cristóbal
 
-> **Pendiente (Persona C).** Análisis completo de S3 con el mismo flujo
-> aplicado a S1, S2, S5 y S6: gráfica, descomposición, estacionariedad, ACF y
-> PACF, al menos tres candidatos ARIMA/SARIMA, los cuatro modelos
-> alternativos, diagnóstico de residuos y pronóstico de los 63 meses de
-> prueba, usando `src/modelos_exponenciales.py`.
+S3 corresponde a San Cristóbal, la segunda frontera terrestre del Top 3.
+Contiene 210 meses, desde enero de 2009 hasta junio de 2026, sin ceros; el
+mínimo del entrenamiento es 14 viajeros.
+
+![S3: serie mensual y partición temporal](img/final/s3_serie_particion.png)
+
+Antes de 2020 la serie crece, pero con oscilaciones relativas mayores que S1 y
+S2. La pandemia la lleva cerca de cero y el entrenamiento termina cuando la
+recuperación apenas comienza.
+
+![S3: descomposición del entrenamiento](img/final/s3_descomposicion.png)
+
+La fuerza de tendencia es 0.707 y la fuerza estacional 0.399. La correlación
+media-desviación prepandemia fue 0.529, por lo que se prefiere la
+descomposición multiplicativa. El logaritmo reduce esa correlación a -0.468 y
+estabiliza la relación entre nivel y amplitud.
+
+![S3: media y variación móvil](img/final/s3_varianza.png)
+
+| Transformación | p ADF | p KPSS | Lectura |
+|---|---:|---:|---|
+| Nivel | 0.5854 | 0.0208 | No estacionaria |
+| Logaritmo | 0.2527 | 0.1000 | Resultado mixto |
+| Logaritmo con `d=1` | 0.9121 | 0.1000 | Resultado mixto |
+| Logaritmo con `D=1` | 0.9269 | 0.0242 | No estacionaria |
+| Logaritmo con `d=1` y `D=1` | 0.0002 | 0.1000 | Estacionaria según ambas pruebas |
+
+En S3, a diferencia de S1 y S2, `d=1` no es suficiente: ADF todavía no
+rechaza la raíz unitaria. La combinación `d=1,D=1` sí obtiene acuerdo entre
+ADF y KPSS.
+
+![S3: ACF y PACF](img/final/s3_acf_pacf.png)
+
+Tras `d=1`, la señal principal de ACF y PACF es negativa en el rezago 1. Por
+eso se comparan ARIMA(1,1,0), ARIMA(0,1,1), ARIMA(1,1,1) y un SARIMA anual.
+`auto_arima` propuso (2,0,1)(1,0,0,12), pero sus `d=0,D=0` contradicen las
+pruebas formales y su RMSE tampoco mejora a Prophet.
+
+| Modelo | AIC | BIC | MAE | RMSE | MAPE |
+|---|---:|---:|---:|---:|---:|
+| Prophet | N/A | N/A | 7,723 | 10,437 | 146.89% |
+| Suavizamiento exponencial simple | N/A | N/A | 20,483 | 23,091 | 80.03% |
+| ARIMA(1,1,0) | 274.72 | 280.67 | 20,897 | 23,544 | 80.26% |
+| ARIMA(1,1,1) | 273.96 | 282.87 | 21,067 | 23,694 | 81.87% |
+| ARIMA(0,1,1) | 274.74 | 280.68 | 21,094 | 23,732 | 81.59% |
+| Seasonal Naive | N/A | N/A | 21,408 | 24,053 | 86.23% |
+| Holt-Winters | N/A | N/A | 22,180 | 24,611 | 94.08% |
+| auto_arima(2,0,1)(1,0,0,12) | 254.16 | 268.62 | 22,870 | 25,383 | 96.50% |
+| SARIMA(1,1,1)(0,1,1,12) | 239.04 | 250.19 | 22,941 | 25,447 | 97.19% |
+
+![S3: comparación de pronósticos](img/final/s3_pronosticos.png)
+![S3: RMSE por modelo](img/final/s3_rmse_modelos.png)
+
+Prophet obtiene por amplio margen el menor RMSE (10,437), aunque su MAPE es
+alto porque varios valores observados son pequeños. El resultado se interpreta
+como el menos impreciso entre los candidatos, no como un pronóstico exacto.
+
+![S3: diagnóstico del candidato ARIMA](img/final/s3_residuos.png)
+
+ARIMA(1,1,0), el candidato ARIMA con menor RMSE, conserva autocorrelación
+(`p=0.033`) y no presenta residuos normales según Jarque-Bera (`p<0.001`).
+Prophet también conserva autocorrelación (`p<0.001`), por lo que su ventaja
+proviene del error fuera de muestra y no de un residuo compatible con ruido
+blanco.
 
 ### 7.4 Comparación de Fronteras
 
-> **Pendiente (Persona C).** Con S1 y S2 ya disponibles en
-> `data/processed/resultados/metricas_s1_s2_s6.csv` y
-> `estacionariedad_s1_s2_s6.csv`, falta agregar S3 y responder, con evidencia
-> normalizada, cuál frontera tiene mayor estacionalidad, mayor tendencia de
-> crecimiento, mayor volatilidad y mayor efecto de la pandemia.
+| Frontera | Fuerza estacional | CAGR 2009–2019 | Pendiente relativa mensual | CV 2009–2019 | Desv. log-diferencias | Caída 2020 vs 2019 |
+|---|---:|---:|---:|---:|---:|---:|
+| La Aurora | 0.559 | 4.74% | 0.412% | 0.217 | 0.171 | 72.81% |
+| Valle Nuevo | 0.311 | 9.69% | 0.778% | 0.398 | 0.369 | 80.72% |
+| San Cristóbal | 0.399 | 12.95% | 0.984% | 0.522 | 0.348 | 72.57% |
+
+1. **Mayor estacionalidad: La Aurora.** Su fuerza estacional de 0.559 supera
+   a San Cristóbal (0.399) y Valle Nuevo (0.311). El tráfico aéreo muestra el
+   patrón anual más repetitivo.
+2. **Mayor tendencia de crecimiento: San Cristóbal.** Presenta el mayor CAGR
+   prepandemia (12.95%) y la mayor pendiente relativa mensual (0.984%). Valle
+   Nuevo tiene la mayor pendiente absoluta en viajeros, pero parte de una
+   escala mayor; al normalizar, San Cristóbal crece más rápido.
+3. **Mayor volatilidad: resultado mixto.** San Cristóbal tiene el mayor
+   coeficiente de variación (0.522), mientras que Valle Nuevo tiene la mayor
+   desviación de log-diferencias (0.369 frente a 0.348). Para variación
+   estrictamente mes a mes se considera más volátil Valle Nuevo; respecto a
+   su nivel promedio, San Cristóbal es el más disperso.
+4. **Más afectada por la pandemia: Valle Nuevo.** Su caída anual fue 80.72%,
+   frente a 72.81% en La Aurora y 72.57% en San Cristóbal. San Cristóbal
+   registró el primer mes nuevamente sobre el promedio mensual de 2019 en
+   junio de 2022; La Aurora en julio de 2022 y Valle Nuevo hasta diciembre de
+   2022. Ninguna sostuvo todavía, hasta junio de 2026, una media móvil de 12
+   meses igual o superior a su promedio de 2019.
 
 ## 8. Categoría Países
 
@@ -711,44 +823,44 @@ infla el error de los últimos 42 meses de prueba para cualquier candidato.
 ## 9. Comparación general de modelos
 
 > **Pendiente (Persona C).** Tabla global combinando
-> `metricas_s0_s5.csv`, `metricas_s1_s2_s6.csv` y las métricas de S3 y S4
+> `metricas_s0_s5.csv`, `metricas_fronteras.csv` y las métricas de S4–S6
 > (`src/evaluacion_modelos.py::combinar_metricas`), con el mejor modelo
 > señalado por serie.
 
 ## 10. Hallazgos útiles para INGUAT
 
-Los resultados de S0, S1, S2, S5 y S6 permiten adelantar los siguientes
-hallazgos prácticos. Deberán complementarse cuando Persona C agregue S3 y S4.
+Los resultados de S0, S1, S2, S3, S5 y S6 permiten adelantar los siguientes
+hallazgos prácticos. Deberán complementarse cuando se agregue S4.
 
 1. **La recuperación cambió el nivel de las series más rápido de lo que los
-   modelos pudieron aprender.** En el total mensual, ambas fronteras
-   analizadas y Estados Unidos, los pronósticos quedan por debajo de los
+   modelos pudieron aprender.** En el total mensual, las tres fronteras
+   analizadas y Estados Unidos, varios pronósticos quedan por debajo de los
    valores observados después de 2022. Para planificación operativa conviene
    actualizar los modelos con frecuencia y no depender durante varios años de
    un ajuste cerrado en marzo de 2021.
 
 2. **La estacionalidad varía notablemente según el punto de entrada.** La
-   fuerza estacional fue 0.704 en S5, 0.559 en S1, 0.506 en S6, 0.467 en S0 y
-   0.311 en S2. Esto sugiere que la programación de campañas, personal y
+   fuerza estacional fue 0.704 en S5, 0.559 en S1, 0.506 en S6, 0.467 en S0,
+   0.399 en S3 y 0.311 en S2. Esto sugiere que la programación de campañas, personal y
    capacidad debe planificarse por mercado y por frontera, y no únicamente con
    el comportamiento promedio del turismo total.
 
 3. **El modelo con menor error todavía puede ser insuficiente para decisiones
    de capacidad.** El mejor RMSE fue aproximadamente 139,549 viajeros en S0,
-   38,251 en S1, 23,187 en S2, 26,794 en S5 y 47,260 en S6. Estas diferencias
+   38,249 en S1, 23,187 en S2, 10,437 en S3, 26,794 en S5 y 47,260 en S6. Estas diferencias
    son grandes frente al volumen mensual, por lo que los pronósticos deben
    acompañarse de escenarios o márgenes de seguridad cuando se utilicen para
    asignar recursos.
 
-4. **AIC y BIC no deben usarse solos para elegir un modelo.** En S0, S1, S5 y
-   S6 hubo candidatos con un ajuste interno atractivo que pronosticaron peor,
-   y en S1 y S5 apareció un SARIMA numéricamente inestable. La evaluación
+4. **AIC y BIC no deben usarse solos para elegir un modelo.** En S0, S1, S2,
+   S3, S5 y S6 hubo candidatos con un ajuste interno atractivo que
+   pronosticaron peor, y en S5 apareció un SARIMA numéricamente inestable. La evaluación
    sobre meses no utilizados durante el ajuste y el diagnóstico de residuos
    son indispensables antes de convertir un modelo en una herramienta de
    planificación.
 
 5. **Ningún modelo domina de forma consistente entre series.** Prophet fue el
-   mejor en S0 y S2, ARIMA(1,1,1) en S1 y S5, y SARIMA(1,1,1)(0,1,1,12) en
+   mejor en S0, S2 y S3, ARIMA(1,1,1) en S1 y S5, y SARIMA(1,1,1)(0,1,1,12) en
    S6. La elección del método debe hacerse serie por serie, no de forma
    única para todo el sistema turístico.
 
@@ -761,7 +873,7 @@ donde el cambio produce 42 meses en cero que no representan el fin del
 retorno de residentes guatemaltecos.
 
 > **Pendiente (Persona C).** Consolidar estos hallazgos con la evidencia de
-> S3 y S4, y con los dos comparativos de la sección 9.
+> S4 y el comparativo de Países.
 
 ## 11. Limitaciones
 
@@ -772,23 +884,23 @@ retorno de residentes guatemaltecos.
 - El cambio de granularidad de la variable `País` desde 2023 limita la
   interpretación de S5 y S6: en S6 produce 42 meses en cero que deben
   excluirse del cálculo de MAPE y no confundirse con una caída real.
-- Algunos candidatos SARIMA con `enforce_stationarity=False` produjeron
+- Un candidato SARIMA con `enforce_stationarity=False` produjo
   pronósticos numéricamente inestables al invertir la transformación
-  logarítmica (S1 y S5). Se documentaron en la tabla de métricas en vez de
-  ocultarse, y se excluyeron únicamente de la escala visual de los gráficos
+  logarítmica en S5. Se documentó en la tabla de métricas en vez de
+  ocultarse, y se excluyó únicamente de la escala visual del gráfico
   de barras.
 - Los modelos alternativos (Prophet, Holt-Winters, suavizamiento simple,
   Seasonal Naive) no reportan AIC ni BIC por diseño; sus residuos, en varias
   series, conservan autocorrelación según Ljung-Box a pesar de tener buen
   desempeño en prueba.
-- Mientras Persona C entrega `src/modelos_exponenciales.py`, Holt-Winters,
-  suavizamiento simple y Seasonal Naive se calculan con adaptadores autónomos
-  dentro de `src/modelado_s0_s5.py` y `src/modelado_s1_s2_s6.py`.
+- Holt-Winters, suavizamiento simple y Seasonal Naive se ejecutan mediante
+  adaptadores reproducibles dentro de los módulos de modelado; todos conservan
+  la misma partición y horizonte.
+- En S1–S3, Jarque-Bera rechaza la normalidad de los residuos ARIMA. Los
+  choques extremos de 2020 producen colas que un modelo gaussiano ordinario no
+  representa por completo.
 
-> **Pendiente (Persona C).** Agregar las limitaciones específicas de S3 y S4,
-> y confirmar que sustituir los adaptadores autónomos por
-> `modelos_exponenciales.py` no cambia la partición, el horizonte ni las
-> métricas reportadas.
+> **Pendiente (Persona C).** Agregar las limitaciones específicas de S4.
 
 ## 12. Conclusiones
 

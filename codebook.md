@@ -214,3 +214,19 @@ para que las siete series se partan de forma idéntica:
 |---|---|---|---|
 | Entrenamiento | ene 2009 – mar 2021 | 147 | 70% |
 | Prueba | abr 2021 – jun 2026 | 63 | 30% |
+
+## 4. Resultados de modelado de Fronteras
+
+Todos los archivos siguientes son generados por
+`src/modelado_fronteras.py`:
+
+| Archivo | Grano y contenido |
+|---|---|
+| `metricas_fronteras.csv` | Una fila por serie y modelo; parámetros, transformación, AIC, BIC, MAE, RMSE, MAPE, Ljung-Box, Jarque-Bera y marca del mejor modelo |
+| `estacionariedad_fronteras.csv` | Una fila por serie y variante de transformación; estadísticos y p-valores ADF/KPSS |
+| `pronosticos_fronteras.csv` | Una fila por fecha, serie y modelo para los 63 meses de prueba |
+| `resumen_fronteras.json` | Inicio, fin, frecuencia, partición, fuerzas, transformación, órdenes y mejor modelo por serie |
+| `comparativo_fronteras.csv` | Evidencia normalizada de estacionalidad, crecimiento, volatilidad e impacto pandémico para S1–S3 |
+
+`Jarque_Bera_p < 0.05` indica que se rechaza normalidad residual.
+`Ljung_Box_p < 0.05` indica autocorrelación residual pendiente de explicar.

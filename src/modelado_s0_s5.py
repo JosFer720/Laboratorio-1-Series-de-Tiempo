@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from prophet import Prophet
+from statsmodels.graphics.gofplots import qqplot
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.holtwinters import ExponentialSmoothing, SimpleExpSmoothing
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -69,6 +70,19 @@ CANDIDATOS_MANUALES = [
         "orden_estacional": (1, 1, 0, 12),
     },
 ]
+
+RAZONAMIENTO_ORDENES = {
+    "S0_total": (
+        "Tras d=1 la ACF conserva una señal estacional en lag 12, mientras "
+        "ACF y PACF no muestran un corte simple en los primeros rezagos. "
+        "Se usa ARIMA(1,1,1) como candidato parsimonioso y se contrasta con "
+        "dos SARIMA de órdenes bajos."
+    ),
+    "S5_estados_unidos": (
+        "Se conserva el razonamiento documentado para S5, fuera del alcance "
+        "del comparativo de Fronteras."
+    ),
+}
 
 
 # Convierte objetos de NumPy, pandas y tuplas a valores que JSON puede guardar.
@@ -332,6 +346,36 @@ def modelar_serie(nombre_serie):
         model="additive",
         period=config.PERIODO_ESTACIONAL,
     )
+    descomposicion_multiplicativa = (
+        seasonal_decompose(
+            train,
+            model="multiplicative",
+            period=config.PERIODO_ESTACIONAL,
+        )
+        if (train > 0).all()
+        else None
+    )
+
+    prepandemia = train[train.index.year <= 2019]
+    anual_nivel = prepandemia.groupby(prepandemia.index.year).agg(
+        ["mean", "std"]
+    )
+    transformada_pre = transformar_serie(prepandemia, transformacion)
+    anual_transformada = transformada_pre.groupby(
+        transformada_pre.index.year
+    ).agg(["mean", "std"])
+    correlacion_nivel = float(
+        anual_nivel["mean"].corr(anual_nivel["std"])
+    )
+    correlacion_transformada = float(
+        anual_transformada["mean"].corr(anual_transformada["std"])
+    )
+    modelo_descomposicion = (
+        "multiplicative"
+        if descomposicion_multiplicativa is not None
+        and correlacion_nivel >= 0.5
+        else "additive"
+    )
 
     resumen = {
         "serie": nombre_serie,
@@ -353,7 +397,11 @@ def modelar_serie(nombre_serie):
         "ceros_train": int((train == 0).sum()),
         "fuerza_estacional": float(fuerza_estacional(descomposicion)),
         "fuerza_tendencia": float(fuerza_tendencia(descomposicion)),
+        "correlacion_media_desviacion_nivel": correlacion_nivel,
+        "correlacion_media_desviacion_transformada": correlacion_transformada,
+        "modelo_descomposicion_preferido": modelo_descomposicion,
         "transformacion": transformacion,
+        "razonamiento_ordenes": RAZONAMIENTO_ORDENES[nombre_serie],
         "orden_auto": sugerencia["orden"],
         "orden_estacional_auto": sugerencia["orden_estacional"],
         "mejor_modelo": mejor["modelo"],
@@ -367,6 +415,7 @@ def modelar_serie(nombre_serie):
         "test": test,
         "estacionariedad": estacionariedad,
         "descomposicion": descomposicion,
+        "descomposicion_multiplicativa": descomposicion_multiplicativa,
         "tabla": tabla,
         "pronosticos": pronosticos,
         "residuos": residuos,
@@ -410,7 +459,7 @@ def guardar_figuras(resultado):
     fig.savefig(DIR_IMG / f"{prefijo}_serie_particion.png", dpi=150)
     plt.close(fig)
 
-    componentes = [
+    componentes_aditivos = [
         (train, "Observada", "#2f6690"),
         (resultado["descomposicion"].trend, "Tendencia", "#c44536"),
         (
@@ -420,12 +469,54 @@ def guardar_figuras(resultado):
         ),
         (resultado["descomposicion"].resid, "Residuo", "#6c757d"),
     ]
-    fig, axes = plt.subplots(4, 1, figsize=(12, 9), sharex=True)
-    for ax, (datos, nombre, color) in zip(axes, componentes):
-        ax.plot(datos.index, datos, color=color, linewidth=1.1)
-        ax.set_ylabel(nombre)
-        ax.grid(alpha=0.22)
-    axes[0].set_title(f"{etiqueta}: descomposición del entrenamiento")
+    multiplicativa = resultado["descomposicion_multiplicativa"]
+    componentes_multiplicativos = (
+        [
+            (train, "Observada", "#2f6690"),
+            (multiplicativa.trend, "Tendencia", "#c44536"),
+            (multiplicativa.seasonal, "Estacionalidad", "#6a994e"),
+            (multiplicativa.resid, "Residuo", "#6c757d"),
+        ]
+        if multiplicativa is not None
+        else None
+    )
+    columnas = 2 if componentes_multiplicativos is not None else 1
+    fig, axes = plt.subplots(
+        4,
+        columnas,
+        figsize=(14 if columnas == 2 else 12, 10),
+        sharex=True,
+        squeeze=False,
+    )
+    for fila, (datos, nombre, color) in enumerate(componentes_aditivos):
+        axes[fila, 0].plot(datos.index, datos, color=color, linewidth=1.0)
+        axes[fila, 0].set_ylabel(nombre)
+        axes[fila, 0].grid(alpha=0.22)
+    axes[0, 0].set_title("Descomposición aditiva")
+    if componentes_multiplicativos is not None:
+        for fila, (datos, nombre, color) in enumerate(
+            componentes_multiplicativos
+        ):
+            axes[fila, 1].plot(
+                datos.index,
+                datos,
+                color=color,
+                linewidth=1.0,
+            )
+            axes[fila, 1].set_ylabel(nombre)
+            axes[fila, 1].grid(alpha=0.22)
+        axes[0, 1].set_title("Descomposición multiplicativa")
+    preferida = {
+        "additive": "aditiva",
+        "multiplicative": "multiplicativa",
+    }[resumen["modelo_descomposicion_preferido"]]
+    fig.suptitle(
+        (
+            f"{etiqueta}: comparación de descomposiciones "
+            f"(preferida: {preferida})"
+        ),
+        y=0.995,
+    )
     fig.tight_layout()
     fig.savefig(DIR_IMG / f"{prefijo}_descomposicion.png", dpi=150)
     plt.close(fig)
@@ -466,12 +557,22 @@ def guardar_figuras(resultado):
     )
     plt.close(fig)
 
-    estacionaria = transformada.diff().diff(12).dropna()
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
-    plot_acf(estacionaria, lags=36, ax=axes[0])
-    plot_pacf(estacionaria, lags=36, ax=axes[1], method="ywm")
-    axes[0].set_title("ACF después de d=1 y D=1")
-    axes[1].set_title("PACF después de d=1 y D=1")
+    regular = transformada.diff().dropna()
+    regular_estacional = regular.diff(12).dropna()
+    fig, axes = plt.subplots(2, 2, figsize=(13, 8))
+    plot_acf(regular, lags=36, ax=axes[0, 0])
+    plot_pacf(regular, lags=36, ax=axes[0, 1], method="ywm")
+    plot_acf(regular_estacional, lags=36, ax=axes[1, 0])
+    plot_pacf(
+        regular_estacional,
+        lags=36,
+        ax=axes[1, 1],
+        method="ywm",
+    )
+    axes[0, 0].set_title("ACF después de d=1")
+    axes[0, 1].set_title("PACF después de d=1")
+    axes[1, 0].set_title("ACF después de d=1 y D=1")
+    axes[1, 1].set_title("PACF después de d=1 y D=1")
     fig.suptitle(f"{etiqueta}: ACF y PACF del entrenamiento", y=0.995)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(
@@ -551,19 +652,39 @@ def guardar_figuras(resultado):
     mejor_arima = candidatos_arima.iloc[0]["modelo"]
     residuo = pd.Series(resultado["residuos"][mejor_arima]).dropna()
     diagnostico = diagnosticar_residuos(residuo)
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
-    axes[0].plot(residuo.index, residuo, color="#6c757d", linewidth=1.0)
-    axes[0].axhline(0, color="#20242b", linewidth=0.9)
-    axes[0].set_title(f"Residuos de {mejor_arima}")
-    axes[0].grid(alpha=0.22)
+    fig, axes = plt.subplots(2, 2, figsize=(13, 8))
+    axes[0, 0].plot(
+        residuo.index,
+        residuo,
+        color="#6c757d",
+        linewidth=1.0,
+    )
+    axes[0, 0].axhline(0, color="#20242b", linewidth=0.9)
+    axes[0, 0].set_title(f"Residuos de {mejor_arima}")
+    axes[0, 0].grid(alpha=0.22)
     plot_acf(
         residuo,
         lags=min(36, len(residuo) // 2 - 1),
-        ax=axes[1],
+        ax=axes[0, 1],
     )
-    axes[1].set_title(
+    axes[0, 1].set_title(
         f"ACF de residuos · Ljung-Box p={diagnostico['Ljung_Box_p']:.3f}"
     )
+    axes[1, 0].hist(
+        residuo,
+        bins=16,
+        color="#9bb7cc",
+        edgecolor="white",
+    )
+    axes[1, 0].set_title(
+        (
+            "Distribución de residuos · "
+            f"Jarque-Bera p={diagnostico['Jarque_Bera_p']:.3f}"
+        )
+    )
+    axes[1, 0].grid(axis="y", alpha=0.22)
+    qqplot(residuo, line="45", ax=axes[1, 1], fit=True)
+    axes[1, 1].set_title("Gráfico Q-Q de normalidad")
     fig.suptitle(f"{etiqueta}: diagnóstico del candidato ARIMA", y=0.995)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(

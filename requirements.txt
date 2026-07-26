@@ -6,7 +6,9 @@ seaborn
 
 statsmodels             
 scikit-learn            
+scipy
 pmdarima                
 prophet                
+plotly
 
 jupyter

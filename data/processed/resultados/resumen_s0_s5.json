@@ -17,9 +17,13 @@
     "media_train": 214217.90043370277,
     "media_test": 241617.1670279873,
     "ceros_train": 0,
-    "fuerza_estacional": 0.4667706936049655,
+    "fuerza_estacional": 0.4667706936049656,
     "fuerza_tendencia": 0.8214721064770694,
+    "correlacion_media_desviacion_nivel": 0.903736827581396,
+    "correlacion_media_desviacion_transformada": -0.43770843641810586,
+    "modelo_descomposicion_preferido": "multiplicative",
     "transformacion": "log",
+    "razonamiento_ordenes": "Tras d=1 la ACF conserva una señal estacional en lag 12, mientras ACF y PACF no muestran un corte simple en los primeros rezagos. Se usa ARIMA(1,1,1) como candidato parsimonioso y se contrasta con dos SARIMA de órdenes bajos.",
     "orden_auto": [
       2,
       0,
@@ -56,7 +60,11 @@
     "ceros_train": 5,
     "fuerza_estacional": 0.7044458927793809,
     "fuerza_tendencia": 0.7090653938346487,
+    "correlacion_media_desviacion_nivel": 0.8975028431314858,
+    "correlacion_media_desviacion_transformada": -0.1633955392864635,
+    "modelo_descomposicion_preferido": "additive",
     "transformacion": "log1p",
+    "razonamiento_ordenes": "Se conserva el razonamiento documentado para S5, fuera del alcance del comparativo de Fronteras.",
     "orden_auto": [
       0,
       1,
@@ -69,8 +77,8 @@
       12
     ],
     "mejor_modelo": "ARIMA(1,1,1)",
-    "mejor_MAE": 22974.83412632357,
-    "mejor_RMSE": 26793.524001489863,
-    "mejor_MAPE": 47.082369882047736
+    "mejor_MAE": 22974.834123084067,
+    "mejor_RMSE": 26793.523998260593,
+    "mejor_MAPE": 47.08236987646559
   }
 }

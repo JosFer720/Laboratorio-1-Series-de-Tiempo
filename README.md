@@ -181,31 +181,46 @@ TEST : abr 2021 – jun 2026   ( 63 meses, 30%)
 > directa de aplicar la proporción pedida sobre este período, y se analiza
 > explícitamente en el informe.
 
-## Modelado reproducible de S0 y S5
+## Modelado reproducible
 
-Este bloque analiza S0 y S5, compara ARIMA/SARIMA, Prophet,
-Holt-Winters, suavizamiento exponencial simple y Seasonal Naive, y exporta las
-métricas de los 63 meses de prueba.
+Los módulos comparan ARIMA/SARIMA, Prophet, Holt-Winters, suavizamiento
+exponencial simple y Seasonal Naive. El Bloque B produce S1–S3 y su comparativo
+estadístico homogéneo.
 
-Desde la raíz del proyecto:
+Desde la raíz del proyecto, en macOS/Linux/WSL:
 
 ```bash
 MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
   .venv/bin/python src/modelado_s0_s5.py
 
 MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
-  .venv/bin/python -m jupyter nbconvert --execute --to notebook \
-  --inplace notebooks/04_modelado_s0_s5.ipynb
+  .venv/bin/python src/modelado_fronteras.py
+
+MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
+  .venv/bin/python -m nbconvert --execute --to notebook --inplace \
+  --ExecutePreprocessor.timeout=600 notebooks/03_series_fronteras.ipynb
 ```
 
-Las pruebas de los módulos compartidos se ejecutan con:
+En PowerShell de Windows, con el entorno activado:
 
-```bash
-MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
-  .venv/bin/python -m unittest -v \
-  tests/test_modelos_arima.py tests/test_evaluacion_modelos.py
+```powershell
+$env:PYTHONPATH = "src"
+$env:MPLCONFIGDIR = Join-Path $env:TEMP "lab1-matplotlib"
+python src/modelado_s0_s5.py
+python src/modelado_fronteras.py
+python -m nbconvert --execute --to notebook --inplace `
+  --ExecutePreprocessor.timeout=600 notebooks/03_series_fronteras.ipynb
+```
+
+Las pruebas completas se ejecutan con:
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest discover -s tests -v
 ```
 
 Los resultados quedan en `data/processed/resultados/`, las figuras en
-`informe/img/final/` y las secciones listas para integrar en
-`informe/secciones/`.
+`informe/img/final/` y el análisis narrativo en `informe/informe_final.md`.
+Para Fronteras, los archivos principales son `metricas_fronteras.csv`,
+`estacionariedad_fronteras.csv`, `pronosticos_fronteras.csv`,
+`comparativo_fronteras.csv` y `resumen_fronteras.json`.
