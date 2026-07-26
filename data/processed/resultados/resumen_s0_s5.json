@@ -17,7 +17,7 @@
     "media_train": 214217.90043370277,
     "media_test": 241617.1670279873,
     "ceros_train": 0,
-    "fuerza_estacional": 0.4667706936049656,
+    "fuerza_estacional": 0.4667706936049655,
     "fuerza_tendencia": 0.8214721064770694,
     "transformacion": "log",
     "orden_auto": [
@@ -32,9 +32,9 @@
       12
     ],
     "mejor_modelo": "Prophet",
-    "mejor_MAE": 132304.63057226443,
-    "mejor_RMSE": 139548.94753689223,
-    "mejor_MAPE": 60.88751155003634
+    "mejor_MAE": 132304.357769672,
+    "mejor_RMSE": 139548.64320989547,
+    "mejor_MAPE": 60.88743410092474
   },
   "S5_estados_unidos": {
     "serie": "S5_estados_unidos",
@@ -69,8 +69,8 @@
       12
     ],
     "mejor_modelo": "ARIMA(1,1,1)",
-    "mejor_MAE": 22974.8341237689,
-    "mejor_RMSE": 26793.523998946082,
-    "mejor_MAPE": 47.08236987762478
+    "mejor_MAE": 22974.83412632357,
+    "mejor_RMSE": 26793.524001489863,
+    "mejor_MAPE": 47.082369882047736
   }
 }

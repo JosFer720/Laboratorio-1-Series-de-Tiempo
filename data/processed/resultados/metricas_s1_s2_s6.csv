@@ -1,0 +1,25 @@
+serie,modelo,parametros,transformacion,AIC,BIC,MAE,RMSE,MAPE,Ljung_Box_p,mejor_modelo
+S1_la_aurora,"ARIMA(1,1,1)","{'orden': (1, 1, 1), 'orden_estacional': (0, 0, 0, 0), 'tendencia': None}",log,207.02703278239164,215.93647268111965,33051.01702271613,38250.636143376316,33.08256135655222,0.07445775449127323,True
+S1_la_aurora,Suavizamiento exponencial simple,"{'tendencia': None, 'estacionalidad': None}",ninguna,,,36821.786047759815,42053.31786869305,36.56306279620979,2.621316364113327e-19,False
+S1_la_aurora,Holt-Winters,"{'tendencia': 'aditiva amortiguada', 'estacionalidad': 'aditiva', 'periodo': 12}",ninguna,,,38906.17532799684,42888.98071202522,39.49459343795741,0.26433197690179117,False
+S1_la_aurora,Prophet,"{'crecimiento': 'linear', 'estacionalidad_anual': True, 'modo_estacional': 'additive'}",ninguna,,,45973.05693049481,50962.92803636545,47.47482853783632,2.06857865508614e-79,False
+S1_la_aurora,"SARIMA(1,1,1)(0,1,1,12)","{'orden': (1, 1, 1), 'orden_estacional': (0, 1, 1, 12), 'tendencia': None}",log,187.10720435546062,198.2571713265888,68213.47453228798,72424.35004102522,71.99709991748054,0.030196154341496792,False
+S1_la_aurora,"auto_arima(1, 0, 1)x(1, 0, 1, 12)","{'orden': (1, 0, 1), 'orden_estacional': (1, 0, 1, 12), 'tendencia': None}",log,189.57422501224846,204.02597065335723,71902.76517884483,75900.64128232271,76.28915424552478,0.03173841106399504,False
+S1_la_aurora,Seasonal Naive,{'rezago': 12},ninguna,,,75518.44036960739,79320.75972667034,81.47749325639356,2.292959091882897e-87,False
+S1_la_aurora,"SARIMA(2,1,1)(1,1,0,12)","{'orden': (2, 1, 1), 'orden_estacional': (1, 1, 0, 12), 'tendencia': None}",log,180.06762182476143,194.00508053867165,13299091564869.02,89641617488858.11,14241804686.932135,0.055539687232640904,False
+S2_valle_nuevo,Prophet,"{'crecimiento': 'linear', 'estacionalidad_anual': True, 'modo_estacional': 'additive'}",ninguna,,,16803.85136918256,23186.82186561063,157.64462957504745,2.5639162673735408e-76,True
+S2_valle_nuevo,Holt-Winters,"{'tendencia': 'aditiva amortiguada', 'estacionalidad': 'aditiva', 'periodo': 12}",ninguna,,,35239.01144611376,38126.466075109296,85.36827926725313,0.8805653700088377,False
+S2_valle_nuevo,Suavizamiento exponencial simple,"{'tendencia': None, 'estacionalidad': None}",ninguna,,,40769.9072248042,45662.768772897296,79.96628211925362,2.226542488082332e-10,False
+S2_valle_nuevo,"ARIMA(1,1,1)","{'orden': (1, 1, 1), 'orden_estacional': (0, 0, 0, 0), 'tendencia': None}",log,329.49962016424314,338.40906006297115,41518.97270863161,46452.17520106141,80.51792947471297,0.055211977471913344,False
+S2_valle_nuevo,"auto_arima(1, 0, 1)x(0, 0, 0, 12)","{'orden': (1, 0, 1), 'orden_estacional': (0, 0, 0, 12), 'tendencia': None}",log,330.9773404395181,339.9075416667798,43693.08459616019,48726.17290840367,84.83073561135768,0.049365749230822216,False
+S2_valle_nuevo,Seasonal Naive,{'rezago': 12},ninguna,,,44707.2302882751,49660.58809058914,91.3851744547971,3.869143330717599e-69,False
+S2_valle_nuevo,"SARIMA(1,1,1)(0,1,1,12)","{'orden': (1, 1, 1), 'orden_estacional': (0, 1, 1, 12), 'tendencia': None}",log,303.0942999867401,314.2442669578683,47115.322807056444,51805.57752098987,96.95976846732805,0.18935554827404455,False
+S2_valle_nuevo,"SARIMA(2,1,1)(1,1,0,12)","{'orden': (2, 1, 1), 'orden_estacional': (1, 1, 0, 12), 'tendencia': None}",log,303.1898839256832,317.12734263959345,47227.66553466532,51923.39374760231,96.88264717486348,0.2726648368737656,False
+S6_guatemala,"SARIMA(1,1,1)(0,1,1,12)","{'orden': (1, 1, 1), 'orden_estacional': (0, 1, 1, 12), 'tendencia': None}",log1p,13.418330841092004,24.568297812220187,27316.82768185001,47260.23062378757,66.21688939316081,0.06533793983409074,True
+S6_guatemala,Suavizamiento exponencial simple,"{'tendencia': None, 'estacionalidad': None}",ninguna,,,38141.10621337801,47372.936858467554,52.03877975807815,5.973978176818063e-13,False
+S6_guatemala,"ARIMA(1,1,1)","{'orden': (1, 1, 1), 'orden_estacional': (0, 0, 0, 0), 'tendencia': None}",log1p,38.66296827438174,47.57240817310974,38591.90469892878,47439.931011971195,51.24027626337978,0.0024516839345586705,False
+S6_guatemala,Holt-Winters,"{'tendencia': 'aditiva amortiguada', 'estacionalidad': 'aditiva', 'periodo': 12}",ninguna,,,39156.82753387163,47912.95117506592,48.104871504917995,0.1667634331345967,False
+S6_guatemala,"auto_arima(1, 0, 1)x(1, 0, 1, 12)","{'orden': (1, 0, 1), 'orden_estacional': (1, 0, 1, 12), 'tendencia': None}",log1p,2.2662250164470237,16.717970657555792,26049.674848987557,48042.53568534239,68.23439776010902,0.026808087978141923,False
+S6_guatemala,Seasonal Naive,{'rezago': 12},ninguna,,,35468.90873015873,49723.64554920901,70.08089675591292,1.0119142879647683e-80,False
+S6_guatemala,"SARIMA(2,1,1)(1,1,0,12)","{'orden': (2, 1, 1), 'orden_estacional': (1, 1, 0, 12), 'tendencia': None}",log1p,10.474939431159338,24.412398145069567,24439.663345165092,50302.80354357905,67.07205223151882,0.2127116365350762,False
+S6_guatemala,Prophet,"{'crecimiento': 'linear', 'estacionalidad_anual': True, 'modo_estacional': 'additive'}",ninguna,,,48592.78278642914,50809.959092670215,80.14649494953586,1.2258678042302539e-71,False
