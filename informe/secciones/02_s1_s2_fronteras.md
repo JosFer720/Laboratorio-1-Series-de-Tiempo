@@ -1,4 +1,8 @@
-> **Nota de integración:** este archivo conserva el fragmento S1–S2 preparado para el avance. Para la entrega del Bloque B, la versión canónica y actualizada —con S1, S2, S3 y el comparativo entre fronteras— es la sección 7 de `informe/informe_final.md`, complementada por `informe/secciones/03_s3_comparativo_fronteras.md`. Este fragmento no debe ensamblarse de forma aislada en la entrega final.
+> **Nota de integración:** este archivo conserva el fragmento S1–S2 preparado
+> para el avance. La versión canónica y actualizada —con S1, S2, S3 y el
+> comparativo entre fronteras— es la sección 7 de `informe/informe_final.md`,
+> complementada por `informe/secciones/03_s3_comparativo_fronteras.md`. Este
+> fragmento no debe ensamblarse de forma aislada en la entrega final.
 
 # S1 y S2 — Fronteras: La Aurora y Valle Nuevo (fragmento histórico del avance)
 
@@ -74,7 +78,7 @@ propuso un orden regular (1,0,1) y uno estacional (1,0,1,12), sin diferenciar.
 ![S1: comparación de pronósticos](../img/final/s1_pronosticos.png)
 
 ARIMA(1,1,1) obtuvo el menor RMSE, con 38,251 viajeros, y el menor MAE, con
-33,051, el error relativo más bajo entre las tres series de este bloque
+33,051, el error relativo más bajo entre las tres series analizadas
 (MAPE 33.1%). Prophet y Holt-Winters quedan en segundo y tercer lugar,
 en ese orden.
 
@@ -84,8 +88,8 @@ SARIMA(2,1,1)(1,1,0,12) obtuvo el AIC más bajo entre los candidatos
 ARIMA/SARIMA de S1, pero al invertir la transformación logarítmica sobre 63
 pasos su pronóstico se dispara a un orden de magnitud sin sentido económico.
 Se conserva en la tabla como evidencia de por qué fue descartado y se omite
-de la escala visual del gráfico de barras, el mismo tratamiento que Persona A
-aplicó a un candidato inestable de S5. Este resultado vuelve a confirmar que
+de la escala visual del gráfico de barras, el mismo tratamiento aplicado a un
+candidato inestable de S5. Este resultado vuelve a confirmar que
 un AIC competitivo no garantiza un pronóstico utilizable.
 
 ## Diagnóstico de residuos — S1
@@ -193,13 +197,13 @@ necesariamente el que mejor pronostica fuera de muestra.
 
 ---
 
-## Nota de entrega para el comparativo de Fronteras
+## Integración con el comparativo de Fronteras
 
 Las tablas de S1 y S2 quedan en un formato homogéneo dentro de
 `data/processed/resultados/metricas_s1_s2_s6.csv`, junto con la
 estacionariedad y los pronósticos completos en
 `estacionariedad_s1_s2_s6.csv` y `pronosticos_s1_s2_s6.csv`. Con esta
-evidencia, Persona C puede completar el comparativo de Fronteras agregando
-S3 — San Cristóbal y respondiendo, con la misma evidencia normalizada, cuál
-frontera tiene mayor estacionalidad, mayor tendencia de crecimiento, mayor
-volatilidad y mayor efecto de la pandemia.
+evidencia se integró S3 — San Cristóbal en el comparativo canónico, que
+responde con métricas normalizadas cuál frontera tiene mayor estacionalidad,
+mayor tendencia de crecimiento, mayor volatilidad y mayor efecto de la
+pandemia.

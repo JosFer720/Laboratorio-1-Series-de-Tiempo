@@ -1,4 +1,9 @@
-# S5 — Estados Unidos
+> **Nota de integración:** este fragmento precede a la ejecución unificada de
+> S4–S6. Para la entrega se debe usar la sección 8 de
+> `informe/informe_final.md`, que contiene S4–S6 con la misma plantilla y las
+> métricas regeneradas.
+
+# S5 — Estados Unidos (fragmento histórico)
 
 S5 representa el total mensual asociado con Estados Unidos dentro de la
 categoría País. La serie contiene 210 meses, desde enero de 2009 hasta junio de

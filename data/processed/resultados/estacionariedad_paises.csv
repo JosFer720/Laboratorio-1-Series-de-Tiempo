@@ -1,0 +1,16 @@
+serie,transformacion,ADF,p_ADF,KPSS,p_KPSS,veredicto
+S4_el_salvador,Nivel,-1.897314699765777,0.33332541332269217,0.5153727319857593,0.03820433964284701,NO estacionaria (ambas pruebas coinciden)
+S4_el_salvador,log1p,-4.284049613367362,0.00047332852639416656,0.2637727968955233,0.1,estacionaria (ambas pruebas coinciden)
+S4_el_salvador,log1p + d=1,-5.182228911884161,9.557065813310692e-06,0.025702360212370164,0.1,estacionaria (ambas pruebas coinciden)
+S4_el_salvador,log1p + D=1,0.050413249134228434,0.9625078951240907,0.5143308505498252,0.03843899762391324,NO estacionaria (ambas pruebas coinciden)
+S4_el_salvador,log1p + d=1 + D=1,-6.056802359986133,1.2395672202622832e-07,0.024500647933221306,0.1,estacionaria (ambas pruebas coinciden)
+S5_estados_unidos,Nivel,-3.1858499594207954,0.020818488618028742,0.1819438314358462,0.1,estacionaria (ambas pruebas coinciden)
+S5_estados_unidos,log1p,-2.655473429859211,0.08206527338550174,0.3233787596932272,0.1,"resultado mixto: KPSS dice estacionaria, ADF no"
+S5_estados_unidos,log1p + d=1,-2.8722044332714445,0.04867703462988692,0.020537625839650846,0.1,estacionaria (ambas pruebas coinciden)
+S5_estados_unidos,log1p + D=1,-0.2774375297602242,0.9286396232340952,0.4360673017526218,0.061608921658352675,"resultado mixto: KPSS dice estacionaria, ADF no"
+S5_estados_unidos,log1p + d=1 + D=1,-5.318128605436463,5.021529572477438e-06,0.024841957853543695,0.1,estacionaria (ambas pruebas coinciden)
+S6_guatemala,Nivel,-2.1798458992514833,0.21364137283650697,0.6148194854454503,0.021289137686777246,NO estacionaria (ambas pruebas coinciden)
+S6_guatemala,log1p,-1.794050311152375,0.38341952423717995,0.25872316489432895,0.1,"resultado mixto: KPSS dice estacionaria, ADF no"
+S6_guatemala,log1p + d=1,-3.0044313380976266,0.03448263627189624,0.10676035057830788,0.1,estacionaria (ambas pruebas coinciden)
+S6_guatemala,log1p + D=1,-0.5916220632576575,0.8728638819654633,0.5602783858364584,0.02809045364043729,NO estacionaria (ambas pruebas coinciden)
+S6_guatemala,log1p + d=1 + D=1,-3.7839763902281955,0.0030755786138345472,0.045847862707723286,0.1,estacionaria (ambas pruebas coinciden)

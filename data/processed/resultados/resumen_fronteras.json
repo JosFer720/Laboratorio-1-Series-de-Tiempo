@@ -24,6 +24,7 @@
     "correlacion_media_desviacion_transformada": -0.20874434107236078,
     "modelo_descomposicion_preferido": "multiplicative",
     "transformacion": "log",
+    "d_recomendado": 1,
     "razonamiento_ordenes": "Tras d=1 no hay un corte limpio en el primer rezago; ACF y PACF conservan picos aislados en 5 y 7 por el choque pandémico. Se comparan p,q bajos (1,0), (0,1) y (1,1), más un SARIMA anual.",
     "orden_auto": [
       1,
@@ -66,6 +67,7 @@
     "correlacion_media_desviacion_transformada": -0.5389655476715318,
     "modelo_descomposicion_preferido": "additive",
     "transformacion": "log",
+    "d_recomendado": 1,
     "razonamiento_ordenes": "Tras d=1, ACF y PACF muestran un pico negativo significativo en lag 1. Se contrastan ARIMA(1,1,0), ARIMA(0,1,1) y ARIMA(1,1,1); la estacionalidad moderada motiva un candidato SARIMA.",
     "orden_auto": [
       1,
@@ -108,6 +110,7 @@
     "correlacion_media_desviacion_transformada": -0.46756668101256194,
     "modelo_descomposicion_preferido": "multiplicative",
     "transformacion": "log",
+    "d_recomendado": 1,
     "razonamiento_ordenes": "Tras d=1, ACF y PACF presentan su señal principal negativa en lag 1. Por eso se comparan términos AR(1), MA(1), su combinación y un SARIMA anual para verificar si la estacionalidad agrega valor.",
     "orden_auto": [
       2,

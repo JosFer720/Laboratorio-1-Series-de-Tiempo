@@ -230,3 +230,27 @@ Todos los archivos siguientes son generados por
 
 `Jarque_Bera_p < 0.05` indica que se rechaza normalidad residual.
 `Ljung_Box_p < 0.05` indica autocorrelación residual pendiente de explicar.
+
+## 5. Resultados de modelado de Países
+
+`src/modelado_paises.py` genera los artefactos homogéneos de S4–S6:
+
+| Archivo | Grano y contenido |
+|---|---|
+| `metricas_paises.csv` | Una fila por país y modelo, con el mismo contrato de métricas de Fronteras |
+| `estacionariedad_paises.csv` | ADF y KPSS para nivel, `log1p` y diferencias regulares/estacionales |
+| `pronosticos_paises.csv` | Una fila por fecha, serie y modelo durante los 63 meses de prueba |
+| `resumen_paises.json` | Partición, fuerzas, transformación, razonamiento de órdenes y mejor modelo |
+| `comparativo_paises.csv` | Estacionalidad, crecimiento, volatilidad, caída pandémica y recuperación de S4–S6 |
+
+Para S6, `MAPE` excluye los meses observados en cero. Esa exclusión evita una
+división indefinida, pero no corrige la pérdida de comparabilidad causada por
+el cambio de granularidad desde 2023.
+
+## 6. Tabla maestra
+
+`metricas_maestras.csv` consolida S0–S6. S0 se toma de
+`metricas_s0_s5.csv`, S1–S3 de `metricas_fronteras.csv` y S4–S6 de
+`metricas_paises.csv`; la versión histórica de S5 se descarta al unir para no
+duplicar esa serie. La columna `mejor_modelo` se recalcula por el menor RMSE
+dentro de cada serie.

@@ -5,9 +5,6 @@
 Análisis y pronóstico del ingreso de viajeros internacionales a Guatemala
 (enero 2009 – junio 2026) a partir de los registros mensuales de migración.
 
-> **Nota sobre los datos:** son de **uso exclusivamente académico**. No corresponden
-> a cifras oficiales del INGUAT ni del Instituto Guatemalteco de Migración.
-
 ## Estructura del proyecto
 
 ```
@@ -184,8 +181,9 @@ TEST : abr 2021 – jun 2026   ( 63 meses, 30%)
 ## Modelado reproducible
 
 Los módulos comparan ARIMA/SARIMA, Prophet, Holt-Winters, suavizamiento
-exponencial simple y Seasonal Naive. El Bloque B produce S1–S3 y su comparativo
-estadístico homogéneo.
+exponencial simple y Seasonal Naive. S1–S3 forman el análisis de Fronteras y
+S4–S6 el análisis de Países; ambas categorías usan el mismo comparativo
+estadístico.
 
 Desde la raíz del proyecto, en macOS/Linux/WSL:
 
@@ -197,8 +195,15 @@ MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
   .venv/bin/python src/modelado_fronteras.py
 
 MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
+  .venv/bin/python src/modelado_paises.py
+
+MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
   .venv/bin/python -m nbconvert --execute --to notebook --inplace \
   --ExecutePreprocessor.timeout=600 notebooks/03_series_fronteras.ipynb
+
+MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=src \
+  .venv/bin/python -m nbconvert --execute --to notebook --inplace \
+  --ExecutePreprocessor.timeout=600 notebooks/04_series_paises.ipynb
 ```
 
 En PowerShell de Windows, con el entorno activado:
@@ -208,8 +213,11 @@ $env:PYTHONPATH = "src"
 $env:MPLCONFIGDIR = Join-Path $env:TEMP "lab1-matplotlib"
 python src/modelado_s0_s5.py
 python src/modelado_fronteras.py
+python src/modelado_paises.py
 python -m nbconvert --execute --to notebook --inplace `
   --ExecutePreprocessor.timeout=600 notebooks/03_series_fronteras.ipynb
+python -m nbconvert --execute --to notebook --inplace `
+  --ExecutePreprocessor.timeout=600 notebooks/04_series_paises.ipynb
 ```
 
 Las pruebas completas se ejecutan con:
@@ -224,3 +232,6 @@ Los resultados quedan en `data/processed/resultados/`, las figuras en
 Para Fronteras, los archivos principales son `metricas_fronteras.csv`,
 `estacionariedad_fronteras.csv`, `pronosticos_fronteras.csv`,
 `comparativo_fronteras.csv` y `resumen_fronteras.json`.
+Para Países se generan los cinco archivos equivalentes con sufijo `_paises`,
+además de `metricas_maestras.csv`, que consolida los 64 ajustes de S0–S6 sin
+duplicar S5.

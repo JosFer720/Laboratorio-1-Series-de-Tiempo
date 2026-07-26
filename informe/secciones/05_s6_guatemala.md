@@ -1,4 +1,9 @@
-# S6 — Guatemala
+> **Nota de integración:** este fragmento precede a la ejecución unificada de
+> S4–S6. Para la entrega se debe usar la sección 8 de
+> `informe/informe_final.md`, que contiene S4–S6 con la misma plantilla y las
+> métricas regeneradas.
+
+# S6 — Guatemala (fragmento histórico)
 
 La serie S6 corresponde a viajeros con `País = Guatemala`. Contiene 210
 observaciones, desde enero de 2009 hasta junio de 2026, sin ceros en
@@ -108,11 +113,11 @@ desde 2023, lo que infla el error de los últimos 42 meses de prueba para
 cualquier candidato. Esta limitación debe explicarse junto con las métricas de
 S6 y no atribuirse a una caída real del turismo o la migración.
 
-## Nota de entrega para el comparativo de Países
+## Integración con el comparativo de Países
 
 Las métricas de S6 quedan en el mismo formato homogéneo que S1 y S2, dentro
 de `data/processed/resultados/metricas_s1_s2_s6.csv`, junto con la
 estacionariedad completa en `estacionariedad_s1_s2_s6.csv`. Con esta
-evidencia, Persona C puede completar el comparativo de Países junto con S4 y
-S5, separando en ese análisis los cambios reales del movimiento migratorio de
-las limitaciones causadas por el cambio de granularidad de `País` desde 2023.
+evidencia se integraron S4 y S5 en el comparativo de Países, separando los
+cambios reales del movimiento migratorio de las limitaciones causadas por el
+cambio de granularidad de `País` desde 2023.

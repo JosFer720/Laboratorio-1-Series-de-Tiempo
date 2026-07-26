@@ -28,7 +28,7 @@ nb["cells"] = [
         """
 # 03 — Análisis completo de Fronteras (S1–S3)
 
-Este cuaderno completa el **Bloque B de la Parte II** para las tres fronteras
+Este cuaderno presenta el análisis final de las tres fronteras
 con mayor acumulado de turistas y excursionistas: La Aurora, Valle Nuevo y San
 Cristóbal. Cada serie sigue el mismo flujo: inspección, descomposición aditiva
 y multiplicativa, estacionariedad en varianza y media, ACF/PACF, candidatos
@@ -315,7 +315,7 @@ display(comparativo[columnas].round(4))
     ),
     md(
         """
-## Conclusión del Bloque B
+## Conclusión del análisis de Fronteras
 
 Las tres series de Fronteras quedaron analizadas con el mismo contrato
 metodológico y la misma tabla de resultados. La Aurora es la más estacional,

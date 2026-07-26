@@ -44,27 +44,48 @@ ESPECIFICACIONES = {
         "etiqueta": "S1 — La Aurora",
         "transformacion": "log",
         "archivo": "s1",
+        "d_recomendado": 1,
     },
     "S2_valle_nuevo": {
         "etiqueta": "S2 — Valle Nuevo",
         "transformacion": "log",
         "archivo": "s2",
+        "d_recomendado": 1,
     },
     "S3_san_cristobal": {
         "etiqueta": "S3 — San Cristóbal",
         "transformacion": "log",
         "archivo": "s3",
+        "d_recomendado": 1,
+    },
+    "S4_el_salvador": {
+        "etiqueta": "S4 — El Salvador",
+        "transformacion": "log1p",
+        "archivo": "s4",
+        "d_recomendado": 0,
+    },
+    "S5_estados_unidos": {
+        "etiqueta": "S5 — Estados Unidos",
+        "transformacion": "log1p",
+        "archivo": "s5",
+        "d_recomendado": 1,
     },
     "S6_guatemala": {
         "etiqueta": "S6 — Guatemala",
         "transformacion": "log1p",
         "archivo": "s6",
+        "d_recomendado": 1,
     },
 }
 
 ARIMA_110 = {
     "nombre": "ARIMA(1,1,0)",
     "orden": (1, 1, 0),
+    "orden_estacional": (0, 0, 0, 0),
+}
+ARIMA_100 = {
+    "nombre": "ARIMA(1,0,0)",
+    "orden": (1, 0, 0),
     "orden_estacional": (0, 0, 0, 0),
 }
 ARIMA_011 = {
@@ -92,7 +113,21 @@ CANDIDATOS_POR_SERIE = {
     "S1_la_aurora": [ARIMA_110, ARIMA_011, ARIMA_111, SARIMA_111_011],
     "S2_valle_nuevo": [ARIMA_110, ARIMA_011, ARIMA_111, SARIMA_111_011],
     "S3_san_cristobal": [ARIMA_110, ARIMA_011, ARIMA_111, SARIMA_111_011],
-    "S6_guatemala": [ARIMA_111, SARIMA_111_011, SARIMA_211_110],
+    "S4_el_salvador": [
+        ARIMA_100,
+        ARIMA_110,
+        ARIMA_011,
+        ARIMA_111,
+        SARIMA_111_011,
+    ],
+    "S5_estados_unidos": [ARIMA_110, ARIMA_011, ARIMA_111, SARIMA_111_011],
+    "S6_guatemala": [
+        ARIMA_110,
+        ARIMA_011,
+        ARIMA_111,
+        SARIMA_111_011,
+        SARIMA_211_110,
+    ],
 }
 
 RAZONAMIENTO_ORDENES = {
@@ -111,9 +146,23 @@ RAZONAMIENTO_ORDENES = {
         "1. Por eso se comparan términos AR(1), MA(1), su combinación y un "
         "SARIMA anual para verificar si la estacionalidad agrega valor."
     ),
+    "S4_el_salvador": (
+        "log1p es estacionaria según ADF y KPSS, por lo que d=0 es suficiente; "
+        "la ACF transformada decae y la PACF se concentra en lag 1, motivando "
+        "ARIMA(1,0,0). Como sensibilidad se contrastan candidatos con d=1 y "
+        "un SARIMA anual, además de comprobar la propuesta de auto_arima."
+    ),
+    "S5_estados_unidos": (
+        "Tras aplicar log1p y d=1, ACF y PACF tampoco presentan un corte "
+        "nítido en los primeros rezagos. Se comparan órdenes bajos p,q en "
+        "{0,1} y un SARIMA anual; esta decisión evita justificar un orden "
+        "alto únicamente por observaciones extremas de la pandemia."
+    ),
     "S6_guatemala": (
-        "Se conserva la especificación ya integrada para S6, fuera del "
-        "comparativo de Fronteras."
+        "Tras log1p y d=1, la PACF presenta señal en lag 2 y la ACF conserva "
+        "estructura en lag 12. Se comparan órdenes cortos p,q en {0,1}, un "
+        "SARIMA anual y un candidato con p=2; auto_arima se usa como "
+        "contraste y no como sustituto del razonamiento manual."
     ),
 }
 
@@ -122,6 +171,11 @@ NOMBRES_FRONTERAS = (
     "S1_la_aurora",
     "S2_valle_nuevo",
     "S3_san_cristobal",
+)
+NOMBRES_PAISES = (
+    "S4_el_salvador",
+    "S5_estados_unidos",
+    "S6_guatemala",
 )
 
 
@@ -427,6 +481,7 @@ def modelar_serie(nombre_serie):
         "correlacion_media_desviacion_transformada": correlacion_transformada,
         "modelo_descomposicion_preferido": modelo_descomposicion,
         "transformacion": transformacion,
+        "d_recomendado": especificacion["d_recomendado"],
         "razonamiento_ordenes": RAZONAMIENTO_ORDENES[nombre_serie],
         "orden_auto": sugerencia["orden"],
         "orden_estacional_auto": sugerencia["orden_estacional"],
@@ -583,7 +638,12 @@ def guardar_figuras(resultado):
     )
     plt.close(fig)
 
-    regular = transformada.diff().dropna()
+    d_recomendado = ESPECIFICACIONES[resumen["serie"]]["d_recomendado"]
+    regular = (
+        transformada.diff().dropna()
+        if d_recomendado == 1
+        else transformada.dropna()
+    )
     regular_estacional = regular.diff(12).dropna()
     fig, axes = plt.subplots(2, 2, figsize=(13, 8))
     plot_acf(regular, lags=36, ax=axes[0, 0])
@@ -595,10 +655,14 @@ def guardar_figuras(resultado):
         ax=axes[1, 1],
         method="ywm",
     )
-    axes[0, 0].set_title("ACF después de d=1")
-    axes[0, 1].set_title("PACF después de d=1")
-    axes[1, 0].set_title("ACF después de d=1 y D=1")
-    axes[1, 1].set_title("PACF después de d=1 y D=1")
+    axes[0, 0].set_title(f"ACF después de d={d_recomendado}")
+    axes[0, 1].set_title(f"PACF después de d={d_recomendado}")
+    axes[1, 0].set_title(
+        f"ACF después de d={d_recomendado} y D=1"
+    )
+    axes[1, 1].set_title(
+        f"PACF después de d={d_recomendado} y D=1"
+    )
     fig.suptitle(f"{etiqueta}: ACF y PACF del entrenamiento", y=0.995)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(
@@ -721,10 +785,14 @@ def guardar_figuras(resultado):
     plt.close(fig)
 
 
-# Calcula la evidencia homogénea solicitada para comparar las tres fronteras.
-def calcular_comparativo_fronteras(resultados):
+# Calcula la evidencia homogénea solicitada para cualquier categoría.
+def _calcular_comparativo_categoria(
+    resultados,
+    nombres,
+    columna_categoria,
+):
     filas = []
-    for nombre in NOMBRES_FRONTERAS:
+    for nombre in nombres:
         resultado = resultados[nombre]
         serie = resultado["serie"]
         tendencia = resultado["descomposicion"].trend.dropna()
@@ -788,9 +856,11 @@ def calcular_comparativo_fronteras(resultados):
         filas.append(
             {
                 "serie": nombre,
-                "frontera": ESPECIFICACIONES[nombre]["etiqueta"].split("—")[
-                    -1
-                ].strip(),
+                columna_categoria: (
+                    ESPECIFICACIONES[nombre]["etiqueta"]
+                    .split("—")[-1]
+                    .strip()
+                ),
                 "fuerza_estacional": resultado["resumen"][
                     "fuerza_estacional"
                 ],
@@ -836,6 +906,24 @@ def calcular_comparativo_fronteras(resultados):
         .astype(int)
     )
     return tabla
+
+
+# Aplica el comparador común a las tres fronteras del Top 3.
+def calcular_comparativo_fronteras(resultados):
+    return _calcular_comparativo_categoria(
+        resultados,
+        NOMBRES_FRONTERAS,
+        "frontera",
+    )
+
+
+# Aplica exactamente las mismas métricas a los tres países del Top 3.
+def calcular_comparativo_paises(resultados):
+    return _calcular_comparativo_categoria(
+        resultados,
+        NOMBRES_PAISES,
+        "pais",
+    )
 
 
 def _ejecutar_modelado(nombres, sufijo, guardar=True, generar_figuras=True):
@@ -930,6 +1018,95 @@ def ejecutar_modelado_fronteras(guardar=True, generar_figuras=True):
             index=False,
         )
     return resultados, comparativo
+
+
+def construir_tabla_maestra(
+    metricas_s0_s5,
+    metricas_fronteras,
+    metricas_paises,
+):
+    """Consolida una sola tabla sin duplicar S5 entre archivos históricos."""
+    metricas_s0 = metricas_s0_s5.loc[
+        metricas_s0_s5["serie"].eq("S0_total")
+    ].copy()
+    tabla = pd.concat(
+        [metricas_s0, metricas_fronteras, metricas_paises],
+        ignore_index=True,
+    )
+    esperadas = {
+        "S0_total",
+        "S1_la_aurora",
+        "S2_valle_nuevo",
+        "S3_san_cristobal",
+        "S4_el_salvador",
+        "S5_estados_unidos",
+        "S6_guatemala",
+    }
+    encontradas = set(tabla["serie"].unique())
+    if encontradas != esperadas:
+        faltantes = sorted(esperadas - encontradas)
+        adicionales = sorted(encontradas - esperadas)
+        raise ValueError(
+            "La tabla maestra no contiene exactamente S0–S6. "
+            f"Faltantes={faltantes}; adicionales={adicionales}."
+        )
+
+    tabla["mejor_modelo"] = False
+    indices_mejores = tabla.groupby("serie")["RMSE"].idxmin()
+    tabla.loc[indices_mejores, "mejor_modelo"] = True
+    orden = {f"S{numero}": numero for numero in range(7)}
+    tabla["_orden_serie"] = tabla["serie"].str.extract(
+        r"^(S\d+)",
+        expand=False,
+    ).map(orden)
+    return (
+        tabla.sort_values(
+            ["_orden_serie", "RMSE"],
+            kind="stable",
+        )
+        .drop(columns="_orden_serie")
+        .reset_index(drop=True)
+    )
+
+
+def ejecutar_modelado_paises(guardar=True, generar_figuras=True):
+    resultados = _ejecutar_modelado(
+        NOMBRES_PAISES,
+        "paises",
+        guardar=guardar,
+        generar_figuras=generar_figuras,
+    )
+    comparativo = calcular_comparativo_paises(resultados)
+    metricas_paises = pd.concat(
+        [resultado["tabla"] for resultado in resultados.values()],
+        ignore_index=True,
+    )
+
+    ruta_s0 = DIR_RESULTADOS / "metricas_s0_s5.csv"
+    ruta_fronteras = DIR_RESULTADOS / "metricas_fronteras.csv"
+    tabla_maestra = None
+    if ruta_s0.exists() and ruta_fronteras.exists():
+        tabla_maestra = construir_tabla_maestra(
+            pd.read_csv(ruta_s0),
+            pd.read_csv(ruta_fronteras),
+            metricas_paises,
+        )
+    elif guardar:
+        raise FileNotFoundError(
+            "Se requieren metricas_s0_s5.csv y metricas_fronteras.csv "
+            "para construir la tabla maestra de S0–S6."
+        )
+
+    if guardar:
+        comparativo.to_csv(
+            DIR_RESULTADOS / "comparativo_paises.csv",
+            index=False,
+        )
+        tabla_maestra.to_csv(
+            DIR_RESULTADOS / "metricas_maestras.csv",
+            index=False,
+        )
+    return resultados, comparativo, tabla_maestra
 
 
 if __name__ == "__main__":

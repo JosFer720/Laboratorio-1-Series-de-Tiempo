@@ -1,8 +1,8 @@
 # Hallazgos útiles para INGUAT
 
 Los resultados de S0 y S5 permiten adelantar cuatro hallazgos prácticos. Estos
-deberán complementarse cuando estén disponibles las otras cinco series, pero
-ya cuentan con evidencia directa en los pronósticos y métricas de la Persona A.
+deberán contrastarse con las otras cinco series y ya cuentan con evidencia
+directa en los pronósticos y métricas disponibles.
 
 1. **La recuperación cambió el nivel de las series más rápido de lo que los
    modelos pudieron aprender.** Tanto en el total mensual como en Estados

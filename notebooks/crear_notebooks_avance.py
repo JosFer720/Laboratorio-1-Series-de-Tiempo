@@ -295,7 +295,7 @@ plt.show()
 {interpretaciones["conclusion"]}
 
 La selección de `p`, `q` y de los modelos predictivos se deja para la entrega
-final, tal como establece la planificación del avance.
+final, manteniendo una partición temporal común para todas las series.
 """
         ),
     ]
