@@ -5,6 +5,14 @@
 Análisis y pronóstico del ingreso de viajeros internacionales a Guatemala
 (enero 2009 – junio 2026) a partir de los registros mensuales de migración.
 
+## Informe
+
+El documento completo puede consultarse en
+[`Laboratorio 1. Series de Tiempo. Informe Final.pdf`](<informe/Laboratorio 1. Series de Tiempo. Informe Final.pdf>).
+
+También está disponible el
+[`informe del avance`](<informe/Laboratorio 1. Series de Tiempo. Avance (1).pdf>).
+
 ## Estructura del proyecto
 
 ```
@@ -228,7 +236,8 @@ python -m unittest discover -s tests -v
 ```
 
 Los resultados quedan en `data/processed/resultados/`, las figuras en
-`informe/img/final/` y el análisis narrativo en `informe/informe_final.md`.
+`informe/img/final/` y el documento completo en
+[`informe/Laboratorio 1. Series de Tiempo. Informe Final.pdf`](<informe/Laboratorio 1. Series de Tiempo. Informe Final.pdf>).
 Para Fronteras, los archivos principales son `metricas_fronteras.csv`,
 `estacionariedad_fronteras.csv`, `pronosticos_fronteras.csv`,
 `comparativo_fronteras.csv` y `resumen_fronteras.json`.
