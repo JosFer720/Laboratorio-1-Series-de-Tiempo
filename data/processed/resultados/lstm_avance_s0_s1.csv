@@ -1,3 +1,5 @@
 serie,modelo,parametros,transformacion,AIC,BIC,MAE,RMSE,MAPE,Ljung_Box_p,Jarque_Bera_p,mejor_modelo
-S0_total,LSTM-2capas-w24,"{'lookback': 24, 'unidades': 64, 'capas': 2, 'dropout': 0.2, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,39076.5695033308,50988.18157333285,23.436693160735775,,,True
-S0_total,LSTM-1capa-w12,"{'lookback': 12, 'unidades': 50, 'capas': 1, 'dropout': 0.0, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,85372.64238802023,101262.75369790157,32.67244610637936,,,False
+S0_total,LSTM-2capas-w24,"{'lookback': 24, 'unidades': 64, 'capas': 2, 'dropout': 0.2, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,39076.57557971969,50988.188312680475,23.43669663827396,,,True
+S0_total,LSTM-1capa-w12,"{'lookback': 12, 'unidades': 50, 'capas': 1, 'dropout': 0.0, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,85372.60803782182,101262.72988605266,32.672433236318206,,,False
+S1_la_aurora,LSTM-2capas-w24,"{'lookback': 24, 'unidades': 64, 'capas': 2, 'dropout': 0.2, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,14872.791273388904,18998.19784830014,18.24848842621972,,,True
+S1_la_aurora,LSTM-1capa-w12,"{'lookback': 12, 'unidades': 50, 'capas': 1, 'dropout': 0.0, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,17851.218852753984,23957.665380186823,18.29639140975912,,,False
