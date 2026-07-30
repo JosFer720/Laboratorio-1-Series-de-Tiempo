@@ -4,11 +4,12 @@ openpyxl
 matplotlib
 seaborn
 
-statsmodels             
-scikit-learn            
+statsmodels
+scikit-learn
 scipy
-pmdarima                
-prophet                
+pmdarima
+prophet
 plotly
+tensorflow
 
 jupyter
