@@ -1,5 +1,3 @@
 serie,modelo,parametros,transformacion,AIC,BIC,MAE,RMSE,MAPE,Ljung_Box_p,Jarque_Bera_p,mejor_modelo
 S0_total,LSTM-2capas-w24,"{'lookback': 24, 'unidades': 64, 'capas': 2, 'dropout': 0.2, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,39076.56905768302,50988.180899854015,23.436692722326807,,,True
 S0_total,LSTM-1capa-w12,"{'lookback': 12, 'unidades': 50, 'capas': 1, 'dropout': 0.0, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,85372.64272325605,101262.75379661543,32.672446174038825,,,False
-S1_la_aurora,LSTM-2capas-w24,"{'lookback': 24, 'unidades': 64, 'capas': 2, 'dropout': 0.2, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,14872.789267913526,18998.196712817942,18.24848652352191,,,True
-S1_la_aurora,LSTM-1capa-w12,"{'lookback': 12, 'unidades': 50, 'capas': 1, 'dropout': 0.0, 'epochs': 100, 'batch_size': 16}","MinMax(0,1)",,,17851.22255699627,23957.669640311982,18.296393852583147,,,False
