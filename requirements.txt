@@ -11,5 +11,6 @@ pmdarima
 prophet
 plotly
 tensorflow
+pycatch22==0.4.5
 
 jupyter
