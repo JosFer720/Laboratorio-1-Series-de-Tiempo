@@ -1,0 +1,8 @@
+serie,nombre,categoria,cluster
+S0_total,Total mensual,Total,0
+S1_la_aurora,La Aurora,Frontera,0
+S2_valle_nuevo,Valle Nuevo,Frontera,0
+S3_san_cristobal,San Cristóbal,Frontera,0
+S4_el_salvador,El Salvador,País,0
+S5_estados_unidos,Estados Unidos,País,0
+S6_guatemala,Guatemala,País,1
